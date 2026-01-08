@@ -1,0 +1,890 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Shield, Server, Zap, CheckCircle, Menu, X, ArrowRight, Mail, Phone, MapPin, Clock, Users, Lock, Cpu, Cloud } from 'lucide-react';
+
+// Feature Card Component with animation
+const FeatureCard = ({ icon: Icon, title, description, color, delay }) => {
+  const [ref, setRef] = useState(null);
+  const [isInView, setIsInView] = useState(false);
+
+  useEffect(() => {
+    if (!ref) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(ref);
+
+    return () => {
+      if (ref) {
+        observer.unobserve(ref);
+      }
+    };
+  }, [ref]);
+
+  const colorMap = {
+    blue: {
+      bg: 'from-blue-100 to-blue-200',
+      text: 'text-blue-600',
+      shadow: 'shadow-blue-500/20'
+    },
+    teal: {
+      bg: 'from-teal-100 to-teal-200',
+      text: 'text-teal-600',
+      shadow: 'shadow-teal-500/20'
+    },
+    purple: {
+      bg: 'from-purple-100 to-purple-200',
+      text: 'text-purple-600',
+      shadow: 'shadow-purple-500/20'
+    }
+  };
+
+  const colors = colorMap[color];
+
+  return (
+    <div
+      ref={setRef}
+      className={`flex items-start space-x-4 group p-6 rounded-xl bg-white shadow-md hover:shadow-xl border border-gray-100 transition-all duration-500 hover:-translate-y-1 ${
+        isInView ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'
+      }`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      <div className={`w-16 h-16 bg-gradient-to-br ${colors.bg} rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg ${colors.shadow}`}>
+        <Icon className={`w-8 h-8 ${colors.text}`} />
+      </div>
+      <div className="flex-1">
+        <h4 className="font-bold text-gray-900 mb-2 text-lg group-hover:text-teal-600 transition-colors">{title}</h4>
+        <p className="text-gray-600 leading-relaxed">{description}</p>
+      </div>
+    </div>
+  );
+};
+
+export default function IntegroSystems() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+    message: ''
+  });
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleSubmit = () => {
+    alert('Thank you for your inquiry! We will contact you shortly.');
+    setFormData({ name: '', email: '', phone: '', company: '', message: '' });
+  };
+
+  // Animation hook for fade-in on scroll
+  const useInView = (options = {}) => {
+    const [isInView, setIsInView] = useState(false);
+    const ref = useRef(null);
+
+    useEffect(() => {
+      const observer = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+        }
+      }, { threshold: 0.1, ...options });
+
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
+
+      return () => {
+        if (ref.current) {
+          observer.unobserve(ref.current);
+        }
+      };
+    }, []);
+
+    return [ref, isInView];
+  };
+
+  // Count-up animation for stats - FIXED to prevent duplicate symbols
+  const useCountUp = (end, duration = 2000, isInView) => {
+    const [count, setCount] = useState(0);
+    const [isDecimal, setIsDecimal] = useState(false);
+
+    useEffect(() => {
+      if (!isInView) return;
+
+      // Extract numeric value from string
+      let numericEnd;
+      let hasDecimal = false;
+
+      if (typeof end === 'string') {
+        // Remove all non-numeric characters except decimal point
+        const numStr = end.replace(/[^\d.]/g, '');
+        numericEnd = parseFloat(numStr);
+        hasDecimal = numStr.includes('.');
+        setIsDecimal(hasDecimal);
+      } else {
+        numericEnd = end;
+      }
+
+      let startTime;
+      let animationFrame;
+
+      const animate = (timestamp) => {
+        if (!startTime) startTime = timestamp;
+        const progress = timestamp - startTime;
+        const percentage = Math.min(progress / duration, 1);
+
+        if (hasDecimal) {
+          setCount(parseFloat((numericEnd * percentage).toFixed(1)));
+        } else {
+          setCount(Math.floor(numericEnd * percentage));
+        }
+
+        if (percentage < 1) {
+          animationFrame = requestAnimationFrame(animate);
+        } else {
+          setCount(numericEnd);
+        }
+      };
+
+      animationFrame = requestAnimationFrame(animate);
+
+      return () => {
+        if (animationFrame) {
+          cancelAnimationFrame(animationFrame);
+        }
+      };
+    }, [end, duration, isInView]);
+
+    return { count, isDecimal };
+  };
+
+  const services = [
+    {
+      icon: Server,
+      title: "Managed IT Support",
+      description: "Comprehensive outsourced IT infrastructure management with proactive monitoring and enterprise-grade system administration.",
+      features: ["24/7 Remote Technical Support", "Enterprise Hardware & Software Management", "Real-time Network Monitoring", "Microsoft 365 & Google Workspace Administration"]
+    },
+    {
+      icon: Cloud,
+      title: "Cloud & Backup Solutions",
+      description: "Enterprise cloud infrastructure with redundant backup systems and comprehensive disaster recovery protocols.",
+      features: ["Automated Multi-tier Backups", "Hybrid Cloud & Offsite Storage", "Business Continuity Planning", "Cloud Migration & Optimization"]
+    },
+    {
+      icon: Shield,
+      title: "Cybersecurity Solutions",
+      description: "Multi-layered security architecture designed to protect against evolving threats while maintaining compliance standards.",
+      features: ["Advanced Endpoint Protection", "Next-gen Firewall & IDS/IPS", "Email Security & Phishing Protection", "Ransomware Prevention & Detection"]
+    },
+    {
+      icon: Zap,
+      title: "Automation & Process Optimization",
+      description: "Intelligent workflow automation and systems integration that eliminate manual processes and enhance operational efficiency.",
+      features: ["Business Process Automation", "Custom API Integrations", "Real-time Data Synchronization", "Operational Efficiency Analysis"]
+    },
+    {
+      icon: Cpu,
+      title: "Custom Software Development",
+      description: "Bespoke enterprise applications engineered to align with your specific business requirements and workflows.",
+      features: ["Enterprise Web & Desktop Applications", "Cross-platform Mobile Solutions", "Legacy System Modernization", "Third-party System Integration"]
+    }
+  ];
+
+  const packages = [
+    {
+      name: "Starter IT Care",
+      color: "from-blue-500 to-indigo-600",
+      price: "R1,500 - R2,500",
+      period: "per month",
+      description: "Essential IT support for small businesses (1-5 users)",
+      features: [
+        "Business-hours remote technical support",
+        "Endpoint security & antivirus monitoring",
+        "Email infrastructure & network support",
+        "Microsoft 365 or Google Workspace configuration",
+        "50GB encrypted cloud backup per user",
+        "Monthly comprehensive system audit"
+      ],
+      highlighted: false
+    },
+    {
+      name: "Business IT Pro",
+      color: "from-teal-500 to-cyan-600",
+      price: "R4,000 - R8,000",
+      period: "per month",
+      description: "Comprehensive IT management for growing enterprises (5-20 users)",
+      features: [
+        "Hybrid remote & onsite technical support",
+        "Server infrastructure & network monitoring",
+        "Enterprise-grade firewall & antivirus",
+        "Daily automated backup (cloud + local redundancy)",
+        "Full Microsoft 365 & Workspace administration",
+        "1TB encrypted cloud storage per user",
+        "Priority incident response & quarterly IT audits"
+      ],
+      highlighted: true
+    },
+    {
+      name: "Enterprise Secure",
+      color: "from-pink-500 to-purple-500",
+      price: "R10,000+",
+      period: "per month",
+      description: "Complete security-first IT infrastructure management",
+      features: [
+        "24/7 fully managed IT support & monitoring",
+        "Real-time threat detection & response",
+        "Disaster recovery & business continuity planning",
+        "Unlimited encrypted cloud backup & storage",
+        "Dedicated cloud platform administration",
+        "Process automation & integration consulting",
+        "Compliance management & audit support"
+      ],
+      highlighted: false
+    }
+  ];
+
+  const statsData = [
+    { icon: Users, value: "100+", label: "Enterprise Clients" },
+    { icon: Shield, value: "99.9%", label: "Uptime SLA" },
+    { icon: Clock, value: "<2hr", label: "Avg Response Time" },
+    { icon: Lock, value: "100%", label: "Secure Infrastructure" }
+  ];
+
+  // Stats component with count-up animation
+  const StatCard = ({ stat, index }) => {
+    const [ref, isInView] = useInView();
+    const { count, isDecimal } = useCountUp(stat.value, 2000, isInView);
+
+    const formatCount = () => {
+      if (!isInView) return '0';
+      
+      const value = stat.value;
+      const displayCount = isDecimal ? count.toFixed(1) : count;
+      
+      // Add appropriate symbols based on original value
+      if (typeof value === 'string') {
+        if (value.includes('%')) {
+          return displayCount + '%';
+        } else if (value.includes('<')) {
+          return '<' + displayCount + 'hr';
+        } else if (value.includes('+')) {
+          return displayCount + '+';
+        }
+      }
+      return displayCount;
+    };
+
+    return (
+      <div 
+        ref={ref}
+        className={`text-center group hover:scale-105 transition-all duration-500 ${
+          isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+        style={{ transitionDelay: `${index * 100}ms` }}
+      >
+        <div 
+          className="inline-flex items-center justify-center w-24 h-24 md:w-32 md:h-32 rounded-2xl mb-5 group-hover:shadow-2xl group-hover:shadow-blue-500/40 transition-all duration-300 shadow-lg mx-auto"
+          style={{
+            background: 'linear-gradient(135deg, #3b82f6 0%, #14b8a6 100%)',
+            borderRadius: '1rem'
+          }}
+        >
+          <stat.icon className="w-12 h-12 md:w-16 md:h-16 text-white" />
+        </div>
+        <div className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-teal-600 bg-clip-text text-transparent mb-3">
+          {formatCount()}
+        </div>
+        <div className="text-gray-700 font-semibold text-base md:text-lg">{stat.label}</div>
+      </div>
+    );
+  };
+
+  // Service card with animation
+  const ServiceCard = ({ service, index }) => {
+    const [ref, isInView] = useInView();
+
+    return (
+      <div 
+        ref={ref}
+        className={`bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:-translate-y-2 group text-center ${
+          isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        }`}
+        style={{ transitionDelay: `${index * 150}ms` }}
+      >
+        <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-teal-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg shadow-blue-500/30 mx-auto">
+          <service.icon className="w-8 h-8 text-white" />
+        </div>
+        <h3 className="text-2xl font-bold text-gray-900 mb-4">{service.title}</h3>
+        <p className="text-gray-600 mb-6 leading-relaxed">{service.description}</p>
+        <div className="space-y-3">
+          {service.features.map((feature, idx) => (
+            <div key={idx} className="flex items-center justify-center space-x-3 group/item">
+              <CheckCircle className="w-5 h-5 text-teal-500 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
+              <span className="text-gray-700">{feature}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      {/* Navigation */}
+      <nav className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? 'bg-white shadow-xl' : 'bg-white/95 backdrop-blur-sm'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            <div className="flex items-center space-x-3">
+              <img 
+                src="https://i.postimg.cc/QtkzCRBQ/logo.png" 
+                alt="Integro Systems Logo" 
+                className="h-20 md:h-20 transition-transform duration-300 hover:scale-105"
+              />
+            </div>
+            
+            <div className="hidden md:flex space-x-8">
+              <a href="#services" className="text-gray-700 hover:text-blue-600 transition-colors duration-300 font-medium relative group">
+                Services
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-teal-500 group-hover:w-full transition-all duration-300"></span>
+              </a>
+              <a href="#packages" className="text-gray-700 hover:text-blue-600 transition-colors duration-300 font-medium relative group">
+                Packages
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-teal-500 group-hover:w-full transition-all duration-300"></span>
+              </a>
+              <a href="#about" className="text-gray-700 hover:text-blue-600 transition-colors duration-300 font-medium relative group">
+                About
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-teal-500 group-hover:w-full transition-all duration-300"></span>
+              </a>
+              <a href="#contact" className="text-gray-700 hover:text-blue-600 transition-colors duration-300 font-medium relative group">
+                Contact
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-teal-500 group-hover:w-full transition-all duration-300"></span>
+              </a>
+            </div>
+
+            <button 
+              className="hidden md:block bg-gradient-to-r from-blue-600 to-teal-500 text-white px-6 py-2.5 rounded-lg font-semibold hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105"
+              onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
+            >
+              Get Started
+            </button>
+
+            <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-white border-t animate-slideDown">
+            <div className="px-4 py-4 space-y-3">
+              <a href="#services" className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Services</a>
+              <a href="#packages" className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Packages</a>
+              <a href="#about" className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">About</a>
+              <a href="#contact" className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Contact</a>
+              <button className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white px-6 py-2.5 rounded-lg font-semibold hover:shadow-xl transition-all">
+                Get Started
+              </button>
+            </div>
+          </div>
+        )}
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 px-4 bg-slate-950 text-white relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-20 left-10 w-96 h-96 bg-blue-600 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-10 w-[500px] h-[500px] bg-indigo-600 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
+          <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-blue-700 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center max-w-4xl mx-auto">
+            <div className="inline-block mb-6 px-6 py-3 bg-blue-600/50 backdrop-blur-md rounded-full text-white text-sm md:text-base font-bold border-2 border-blue-400/60 animate-fadeIn shadow-2xl shadow-blue-500/50" style={{boxShadow: '0 0 30px rgba(59, 130, 246, 0.6), 0 0 60px rgba(59, 130, 246, 0.3)'}}>
+              Trusted IT Partner for South African Enterprises
+            </div>
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight animate-fadeInUp drop-shadow-lg">
+              <span className="text-white font-extrabold">Enterprise-Grade IT Infrastructure,</span>
+              <span className="block mt-2 font-extrabold animated-gradient-text">
+                Delivered with Precision
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-100 mb-10 max-w-3xl mx-auto leading-relaxed animate-fadeInUp drop-shadow-md" style={{animationDelay: '0.2s'}}>
+              Empowering South African businesses with resilient IT systems, intelligent automation, and multi-layered cybersecurity solutions designed for operational excellence.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fadeInUp" style={{animationDelay: '0.4s'}}>
+              <button 
+                onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
+                className="bg-gradient-to-r from-blue-600 via-blue-500 to-teal-500 text-white px-8 py-4 rounded-lg font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/60 transition-all duration-300 hover:scale-105 flex items-center justify-center space-x-2 group shadow-xl"
+              >
+                <span>Request Consultation</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+              <button 
+                onClick={() => document.getElementById('services').scrollIntoView({ behavior: 'smooth' })}
+                className="bg-white/20 backdrop-blur-md text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/30 transition-all duration-300 border-2 border-white/40 hover:border-white/60 shadow-lg"
+              >
+                Explore Solutions
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 bg-gradient-to-b from-white to-slate-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+            {statsData.map((stat, index) => (
+              <StatCard key={index} stat={stat} index={index} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section id="services" className="py-20 px-4 bg-gradient-to-b from-white to-slate-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Comprehensive IT Solutions
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              From enterprise infrastructure management to advanced cybersecurity, we deliver the complete technology foundation your organization needs to thrive.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {services.map((service, index) => (
+              <ServiceCard key={index} service={service} index={index} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Packages Section */}
+      <section id="packages" className="py-20 px-4 bg-slate-900 text-white relative overflow-hidden">
+        {/* Background animation */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRDIDI5Ljc5IDMwIDI4IDMxLjc5IDI4IDM0YzAgMi4yMSAxLjc5IDQgNCA0IDIuMjEgMCA0LTEuNzkgNC00eiIvPjwvZz48L2c+PC9zdmc+')] animate-move"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Scalable Service Packages
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Select the optimal IT support package aligned with your business requirements. All packages feature transparent, predictable monthly pricing.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {packages.map((pkg, index) => (
+              <div 
+                key={index}
+                className={`rounded-2xl p-8 border transition-all duration-500 hover:scale-105 text-center ${
+                  pkg.highlighted 
+                    ? 'bg-white/5 backdrop-blur-sm border-teal-400 shadow-2xl shadow-teal-500/30 md:scale-105' 
+                    : 'bg-transparent border-white/20 hover:border-teal-400/50'
+                } relative group`}
+              >
+                {pkg.highlighted && (
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg animate-bounce">
+                    Most Popular
+                  </div>
+                )}
+                <div className={`w-full h-6 bg-gradient-to-r ${pkg.color} rounded-full mb-6 group-hover:h-7 transition-all duration-300 shadow-2xl ring-2 ring-white/10`} style={{opacity: 1}}></div>
+                <h3 className="text-2xl font-bold mb-2 text-white">{pkg.name}</h3>
+                <p className="text-gray-300 mb-6">{pkg.description}</p>
+                <div className="mb-6">
+                  <div className="text-4xl font-bold mb-1 text-white">{pkg.price}</div>
+                  <div className="text-gray-300">{pkg.period}</div>
+                </div>
+                <div className="space-y-4 mb-8">
+                  {pkg.features.map((feature, idx) => (
+                    <div key={idx} className="flex items-center justify-center space-x-3 group/item">
+                      <CheckCircle className="w-5 h-5 text-teal-400 flex-shrink-0 mt-0.5 group-hover/item:scale-110 transition-transform" />
+                      <span className="text-gray-200">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+                <button 
+                  onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
+                  className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
+                    pkg.highlighted
+                      ? 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white hover:shadow-xl hover:shadow-teal-500/50 hover:scale-105'
+                      : 'bg-white/20 text-white hover:bg-white/30 border border-white/30'
+                  }`}
+                >
+                  Get Started
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-16 text-center">
+            <p className="text-gray-400 mb-4 text-lg">Need custom enterprise solutions or one-time services?</p>
+            <button 
+              onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
+              className="text-teal-400 font-semibold hover:text-teal-300 transition-colors inline-flex items-center space-x-2 text-lg group"
+            >
+              <span>Contact us for tailored pricing</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section id="about" className="py-20 px-4 bg-gradient-to-b from-white to-slate-50">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Why Choose Integro Systems?
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Your trusted technology partner delivering measurable results
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-8">
+              {/* Glowing animated card for company description */}
+              <div className="relative group">
+                {/* Animated glow effect behind */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-teal-500 to-blue-500 rounded-2xl opacity-40 blur-md group-hover:opacity-60 transition-all duration-500 animate-gradient"></div>
+                
+                {/* Main card content */}
+                <div className="relative rounded-2xl p-8 shadow-xl border-2 border-blue-400 hover:border-teal-400 transition-all duration-500 animate-pulse-border overflow-hidden">
+                  {/* Animated gradient background */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-teal-50 animate-gradient"></div>
+                  
+                  {/* Content */}
+                  <div className="relative space-y-6">
+                    <p className="text-lg text-gray-700 leading-relaxed font-medium">
+                      Integro Systems is a premier South African IT solutions provider specializing in resilient infrastructure architecture, intelligent process automation, and enterprise-grade cybersecurity. We enable organizations to operate with maximum efficiency, robust security, and minimal technology disruption.
+                    </p>
+                    <p className="text-lg text-gray-700 leading-relaxed font-medium">
+                      Unlike conventional IT providers, we prioritize solutions that deliver measurable ROI—stable, scalable infrastructure, time-saving automation, and layered security that evolves with your business. No unnecessary complexity, no overselling—just reliable technology that drives results.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Animated Feature Cards */}
+              <div className="space-y-6">
+                <FeatureCard 
+                  icon={Shield}
+                  title="Security-First Architecture"
+                  description="Multi-layered protection engineered for real-world threats, not theoretical vulnerabilities."
+                  color="blue"
+                  delay={0}
+                />
+                <FeatureCard 
+                  icon={Zap}
+                  title="Automation Excellence"
+                  description="Eliminate manual processes and enhance operational efficiency through intelligent workflow automation."
+                  color="teal"
+                  delay={100}
+                />
+                <FeatureCard 
+                  icon={Users}
+                  title="Dedicated Partnership"
+                  description="Enterprise-level IT expertise without the overhead of in-house infrastructure teams."
+                  color="purple"
+                  delay={200}
+                />
+              </div>
+            </div>
+
+            <div className="relative">
+              {/* Floating background elements */}
+              <div className="absolute -top-4 -right-4 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+              <div className="absolute -bottom-8 -left-4 w-72 h-72 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+              <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+              
+              {/* Main CTA Card */}
+              <div className="relative bg-gradient-to-br from-blue-600 to-teal-500 rounded-2xl p-8 text-white shadow-2xl shadow-blue-500/40 hover:shadow-blue-500/60 transition-all duration-300 hover:scale-105 overflow-hidden">
+                {/* Animated background pattern */}
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4yIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRDIDI5Ljc5IDMwIDI4IDMxLjc5IDI4IDM0YzAgMi4yMSAxLjc5IDQgNCA0IDIuMjEgMCA0LTEuNzkgNC00eiIvPjwvZz48L2c+PC9zdmc+')] animate-move"></div>
+                </div>
+
+                <Cloud className="w-16 h-16 mb-6 opacity-90 animate-pulse relative z-10" />
+                <h3 className="text-2xl font-bold mb-4 relative z-10">Ready to Transform Your Infrastructure?</h3>
+                <p className="mb-6 text-blue-50 leading-relaxed relative z-10">
+                  Schedule a consultation to discover how we can optimize your technology infrastructure, minimize downtime, and fortify your business operations.
+                </p>
+                
+                <ul className="space-y-3 mb-8 relative z-10">
+                  <li className="flex items-center space-x-3 group/li">
+                    <CheckCircle className="w-5 h-5 flex-shrink-0 group-hover/li:scale-110 transition-transform" />
+                    <span>Complimentary IT infrastructure assessment</span>
+                  </li>
+                  <li className="flex items-center space-x-3 group/li">
+                    <CheckCircle className="w-5 h-5 flex-shrink-0 group-hover/li:scale-110 transition-transform" />
+                    <span>Flexible engagement models</span>
+                  </li>
+                  <li className="flex items-center space-x-3 group/li">
+                    <CheckCircle className="w-5 h-5 flex-shrink-0 group-hover/li:scale-110 transition-transform" />
+                    <span>Transparent, predictable pricing structure</span>
+                  </li>
+                </ul>
+                
+                <button 
+                  onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
+                  className="relative z-10 bg-white text-blue-600 px-6 py-3 rounded-lg font-bold hover:shadow-xl hover:shadow-white/50 transition-all duration-300 hover:scale-105 w-full group"
+                >
+                  <span className="flex items-center justify-center space-x-2">
+                    <span>Schedule Consultation</span>
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="py-20 px-4 bg-slate-900 text-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            Let's Build Your IT Foundation
+          </h2>
+          <p className="text-xl text-gray-300 mb-12">
+            Contact us today for a complimentary IT assessment and discover how we can elevate your business technology infrastructure.
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-teal-400/50 transition-all duration-300 hover:scale-105 group">
+              <Phone className="w-8 h-8 text-teal-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+              <h3 className="font-bold mb-2">Phone</h3>
+              <p className="text-gray-300">+27 (0)XX XXX XXXX</p>
+            </div>
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-teal-400/50 transition-all duration-300 hover:scale-105 group">
+              <Mail className="w-8 h-8 text-teal-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+              <h3 className="font-bold mb-2">Email</h3>
+              <p className="text-gray-300">info@integrosystems.co.za</p>
+            </div>
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-teal-400/50 transition-all duration-300 hover:scale-105 group">
+              <MapPin className="w-8 h-8 text-teal-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+              <h3 className="font-bold mb-2">Location</h3>
+              <p className="text-gray-300">Pretoria, South Africa</p>
+            </div>
+          </div>
+
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
+            <h3 className="text-2xl font-bold mb-6">Request Your Complimentary IT Assessment</h3>
+            <div className="space-y-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <input 
+                  type="text" 
+                  placeholder="Full Name" 
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
+                />
+                <input 
+                  type="email" 
+                  placeholder="Business Email" 
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
+                />
+              </div>
+              <input 
+                type="tel" 
+                placeholder="Contact Number" 
+                value={formData.phone}
+                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
+              />
+              <input 
+                type="text" 
+                placeholder="Company Name" 
+                value={formData.company}
+                onChange={(e) => setFormData({...formData, company: e.target.value})}
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
+              />
+              <textarea 
+                placeholder="Describe your IT requirements..." 
+                rows="4"
+                value={formData.message}
+                onChange={(e) => setFormData({...formData, message: e.target.value})}
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all resize-none"
+              ></textarea>
+              <button 
+                onClick={handleSubmit}
+                className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white px-8 py-4 rounded-lg font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 group"
+              >
+                <span className="flex items-center justify-center space-x-2">
+                  <span>Submit Inquiry</span>
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-slate-950 text-gray-400 py-12 px-4 border-t border-white/5">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="flex items-center justify-center space-x-3 mb-4">
+            <img 
+              src="https://i.postimg.cc/QtkzCRBQ/logo.png" 
+              alt="Integro Systems Logo" 
+              className="h-20 hover:scale-105 transition-transform"
+            />
+          </div>
+          <p className="mb-4 text-lg">Enterprise IT Support, Automation & Security Solutions</p>
+          <p className="text-sm text-gray-500">© 2026 Integro Systems. All rights reserved.</p>
+        </div>
+      </footer>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes gradient {
+          0%, 100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+
+        @keyframes gradientFlow {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+
+        @keyframes move {
+          0% {
+            transform: translate(0, 0);
+          }
+          100% {
+            transform: translate(10px, 10px);
+          }
+        }
+
+        @keyframes blob {
+          0%, 100% {
+            transform: translate(0, 0) scale(1);
+          }
+          33% {
+            transform: translate(30px, -50px) scale(1.1);
+          }
+          66% {
+            transform: translate(-20px, 20px) scale(0.9);
+          }
+        }
+
+        @keyframes pulse-border {
+          0%, 100% {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4), 0 0 40px rgba(20, 184, 166, 0.3);
+          }
+          50% {
+            box-shadow: 0 0 30px rgba(20, 184, 166, 0.5), 0 0 60px rgba(59, 130, 246, 0.4);
+          }
+        }
+
+        .animate-fadeIn {
+          animation: fadeIn 1s ease-out;
+        }
+
+        .animate-fadeInUp {
+          animation: fadeInUp 1s ease-out;
+        }
+
+        .animate-slideDown {
+          animation: slideDown 0.3s ease-out;
+        }
+
+        .animate-gradient {
+          background-size: 200% 200%;
+          animation: gradient 4s ease infinite;
+        }
+
+        .animate-move {
+          animation: move 20s ease-in-out infinite alternate;
+        }
+
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+
+        .animate-pulse-border {
+          animation: pulse-border 3s ease-in-out infinite;
+        }
+
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+
+        .animated-gradient-text {
+          background: linear-gradient(90deg, #06b6d4, #14b8a6, #22d3ee, #06b6d4);
+          background-size: 300% 300%;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          animation: gradientFlow 4s ease infinite;
+          filter: drop-shadow(0 0 40px rgba(6, 182, 212, 0.6));
+        }
+      `}</style>
+    </div>
+  );
+}
