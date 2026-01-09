@@ -392,11 +392,17 @@ export default function IntegroSystems() {
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-t animate-slideDown">
             <div className="px-4 py-4 space-y-3">
-              <a href="#services" className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Services</a>
-              <a href="#packages" className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Packages</a>
-              <a href="#about" className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">About</a>
-              <a href="#contact" className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Contact</a>
-              <button className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white px-6 py-2.5 rounded-lg font-semibold hover:shadow-xl transition-all">
+              <a href="#services" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Services</a>
+              <a href="#packages" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Packages</a>
+              <a href="#about" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">About</a>
+              <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Contact</a>
+              <button 
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white px-6 py-2.5 rounded-lg font-semibold hover:shadow-xl transition-all"
+              >
                 Get Started
               </button>
             </div>
