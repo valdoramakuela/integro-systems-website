@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Shield, Server, Zap, CheckCircle, Menu, X, ArrowRight, Mail, Phone, MapPin, Clock, Users, Lock, Cpu, Cloud } from 'lucide-react';
+import { Shield, Server, Zap, CheckCircle, Menu, X, ArrowRight, Mail, Phone, MapPin, Clock, Users, Lock, Cpu, Cloud, MessageCircle } from 'lucide-react';
 
 // Feature Card Component with animation
 const FeatureCard = ({ icon: Icon, title, description, color, delay }) => {
@@ -85,9 +85,52 @@ export default function IntegroSystems() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSubmit = () => {
-    alert('Thank you for your inquiry! We will contact you shortly.');
-    setFormData({ name: '', email: '', phone: '', company: '', message: '' });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Validation
+    if (!formData.name || !formData.email || !formData.phone || !formData.message) {
+      alert('Please fill in all required fields: Name, Email, Contact Number, and Requirements');
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
+    try {
+      // Using Web3Forms (free email service)
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          access_key: 'YOUR_WEB3FORMS_ACCESS_KEY', // Replace with your actual key
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          company: formData.company,
+          message: formData.message,
+          subject: 'New IT Assessment Request from Integro Systems Website'
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        alert('Thank you for your inquiry! We will contact you shortly.');
+        setFormData({ name: '', email: '', phone: '', company: '', message: '' });
+      } else {
+        alert('There was an error submitting your form. Please try again or contact us directly at info@integrosystems.co.za');
+      }
+    } catch (error) {
+      alert('There was an error submitting your form. Please try again or contact us directly at info@integrosystems.co.za');
+    }
   };
 
   // Animation hook for fade-in on scroll
@@ -332,9 +375,9 @@ export default function IntegroSystems() {
         <p className="text-gray-600 mb-6 leading-relaxed">{service.description}</p>
         <div className="space-y-3">
           {service.features.map((feature, idx) => (
-            <div key={idx} className="flex items-center justify-center space-x-3 group/item">
-              <CheckCircle className="w-5 h-5 text-teal-500 flex-shrink-0 group-hover/item:scale-110 transition-transform" />
-              <span className="text-gray-700">{feature}</span>
+            <div key={idx} className="flex items-start space-x-3 group/item">
+              <CheckCircle className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5 group-hover/item:scale-110 transition-transform" />
+              <span className="text-gray-700 text-left">{feature}</span>
             </div>
           ))}
         </div>
@@ -511,7 +554,7 @@ export default function IntegroSystems() {
                 } relative group`}
               >
                 {pkg.highlighted && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg animate-bounce">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg animate-bounce">
                     Most Popular
                   </div>
                 )}
@@ -524,9 +567,9 @@ export default function IntegroSystems() {
                 </div>
                 <div className="space-y-4 mb-8">
                   {pkg.features.map((feature, idx) => (
-                    <div key={idx} className="flex items-center justify-center space-x-3 group/item">
+                    <div key={idx} className="flex items-start space-x-3 group/item">
                       <CheckCircle className="w-5 h-5 text-teal-400 flex-shrink-0 mt-0.5 group-hover/item:scale-110 transition-transform" />
-                      <span className="text-gray-200">{feature}</span>
+                      <span className="text-gray-200 text-left">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -678,7 +721,7 @@ export default function IntegroSystems() {
             Contact us today for a complimentary IT assessment and discover how we can elevate your business technology infrastructure.
           </p>
           
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-teal-400/50 transition-all duration-300 hover:scale-105 group">
               <Phone className="w-8 h-8 text-teal-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
               <h3 className="font-bold mb-2">Phone</h3>
@@ -689,6 +732,16 @@ export default function IntegroSystems() {
               <h3 className="font-bold mb-2">Email</h3>
               <p className="text-gray-300">info@integrosystems.co.za</p>
             </div>
+            <a 
+              href="https://wa.me/27XXXXXXXXX" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-teal-400/50 transition-all duration-300 hover:scale-105 group cursor-pointer"
+            >
+              <MessageCircle className="w-8 h-8 text-teal-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
+              <h3 className="font-bold mb-2">WhatsApp</h3>
+              <p className="text-gray-300">Chat with us</p>
+            </a>
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-teal-400/50 transition-all duration-300 hover:scale-105 group">
               <MapPin className="w-8 h-8 text-teal-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
               <h3 className="font-bold mb-2">Location</h3>
@@ -698,28 +751,31 @@ export default function IntegroSystems() {
 
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
             <h3 className="text-2xl font-bold mb-6">Request Your Complimentary IT Assessment</h3>
-            <div className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
                 <input 
                   type="text" 
-                  placeholder="Full Name" 
+                  placeholder="Full Name *" 
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  required
                   className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
                 />
                 <input 
                   type="email" 
-                  placeholder="Business Email" 
+                  placeholder="Business Email *" 
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  required
                   className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
                 />
               </div>
               <input 
                 type="tel" 
-                placeholder="Contact Number" 
+                placeholder="Contact Number *" 
                 value={formData.phone}
                 onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                required
                 className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
               />
               <input 
@@ -730,14 +786,15 @@ export default function IntegroSystems() {
                 className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
               />
               <textarea 
-                placeholder="Describe your IT requirements..." 
+                placeholder="Describe your IT requirements... *" 
                 rows="4"
                 value={formData.message}
                 onChange={(e) => setFormData({...formData, message: e.target.value})}
+                required
                 className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all resize-none"
               ></textarea>
               <button 
-                onClick={handleSubmit}
+                type="submit"
                 className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white px-8 py-4 rounded-lg font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 group"
               >
                 <span className="flex items-center justify-center space-x-2">
@@ -745,7 +802,7 @@ export default function IntegroSystems() {
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
               </button>
-            </div>
+            </form>
           </div>
         </div>
       </section>
