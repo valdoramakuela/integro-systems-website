@@ -395,7 +395,7 @@ export default function IntegroSystems() {
               <img 
                 src="https://i.postimg.cc/mrNHcz4K/copy-reduced-logo-removebg-preview.png" 
                 alt="Integro Systems Logo" 
-                className="h-25 md:h-25 transition-transform duration-300 hover:scale-105"
+                className="h-20 md:h-20 transition-transform duration-300 hover:scale-100"
               />
             </div>
             
