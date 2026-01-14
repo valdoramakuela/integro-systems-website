@@ -102,7 +102,7 @@ export default function IntegroSystems() {
     }
 
     try {
-      // Using Web3Forms (free email service)
+      // Using Web3Forms
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: {
@@ -393,7 +393,7 @@ export default function IntegroSystems() {
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center space-x-3">
               <img 
-                src="https://i.postimg.cc/QtkzCRBQ/logo.png" 
+                src="https://i.postimg.cc/PJ0T4yhL/copy-reduced-logo.png" 
                 alt="Integro Systems Logo" 
                 className="h-20 md:h-20 transition-transform duration-300 hover:scale-105"
               />
