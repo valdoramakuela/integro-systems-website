@@ -812,7 +812,7 @@ export default function IntegroSystems() {
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex items-center justify-center space-x-3 mb-4">
             <img 
-              src="https://i.postimg.cc/QtkzCRBQ/logo.png" 
+              src="https://i.postimg.cc/mrNHcz4K/copy-reduced-logo-removebg-preview.png" 
               alt="Integro Systems Logo" 
               className="h-20 hover:scale-105 transition-transform"
             />
