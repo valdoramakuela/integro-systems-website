@@ -110,7 +110,7 @@ export default function IntegroSystems() {
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          access_key: 'YOUR_WEB3FORMS_ACCESS_KEY', // Replace with your actual key
+          access_key: 'a35af147-667e-431e-973d-64375fb18ea5', 
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
@@ -725,15 +725,15 @@ export default function IntegroSystems() {
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-teal-400/50 transition-all duration-300 hover:scale-105 group">
               <Phone className="w-8 h-8 text-teal-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
               <h3 className="font-bold mb-2">Phone</h3>
-              <p className="text-gray-300">+27 (0)XX XXX XXXX</p>
+              <p className="text-gray-300">+27674148908</p>
             </div>
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-teal-400/50 transition-all duration-300 hover:scale-105 group">
               <Mail className="w-8 h-8 text-teal-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
               <h3 className="font-bold mb-2">Email</h3>
-              <p className="text-gray-300">info@integrosystems.co.za</p>
+              <p className="text-gray-300">support@integrosystems.co.za</p>
             </div>
             <a 
-              href="https://wa.me/27XXXXXXXXX" 
+              href="https://wa.me/27674148908" 
               target="_blank" 
               rel="noopener noreferrer"
               className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-teal-400/50 transition-all duration-300 hover:scale-105 group cursor-pointer"
