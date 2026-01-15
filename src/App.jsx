@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Shield, Server, Zap, CheckCircle, Menu, X, ArrowRight, Mail, Phone, MapPin, Clock, Users, Lock, Cpu, Cloud, MessageCircle } from 'lucide-react';
+import { Shield, Server, Zap, CheckCircle, Menu, X, ArrowRight, Mail, Phone, MapPin, Clock, Users, Lock, Cpu, Cloud, MessageCircle, AlertCircle, Loader } from 'lucide-react';
 
 // Feature Card Component with animation
 const FeatureCard = ({ icon: Icon, title, description, color, delay }) => {
@@ -69,6 +69,9 @@ const FeatureCard = ({ icon: Icon, title, description, color, delay }) => {
 export default function IntegroSystems() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null); // 'success' or 'error'
+  const [errorMessage, setErrorMessage] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -87,22 +90,47 @@ export default function IntegroSystems() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
+    setSubmitStatus(null);
+    setErrorMessage('');
     
     // Validation
     if (!formData.name || !formData.email || !formData.phone || !formData.message) {
-      alert('Please fill in all required fields: Name, Email, Contact Number, and Requirements');
+      setSubmitStatus('error');
+      setErrorMessage('Please fill in all required fields: Name, Email, Contact Number, and Requirements');
+      setSubmitting(false);
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      alert('Please enter a valid email address');
+      setSubmitStatus('error');
+      setErrorMessage('Please enter a valid email address');
+      setSubmitting(false);
+      return;
+    }
+
+    // Phone validation (basic)
+    const phoneRegex = /^[\d\s\+\-\(\)]+$/;
+    if (!phoneRegex.test(formData.phone)) {
+      setSubmitStatus('error');
+      setErrorMessage('Please enter a valid phone number');
+      setSubmitting(false);
       return;
     }
 
     try {
-      // Using Web3Forms
+      // Get Cloudflare Turnstile token if available
+      let turnstileToken = null;
+      if (window.turnstile) {
+        try {
+          turnstileToken = await window.turnstile.execute();
+        } catch (error) {
+          console.log('Turnstile not loaded, continuing without it');
+        }
+      }
+
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: {
@@ -110,26 +138,62 @@ export default function IntegroSystems() {
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          access_key: 'a35af147-667e-431e-973d-64375fb18ea5', 
+          access_key: 'a35af147-667e-431e-973d-64375fb18ea5',
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
-          company: formData.company,
+          company: formData.company || 'Not provided',
           message: formData.message,
-          subject: 'New IT Assessment Request from Integro Systems Website'
+          // Dynamic subject with company name
+          subject: `New IT Assessment - ${formData.company || formData.name} - Integro Systems`,
+          from_name: 'Integro Systems Website',
+          replyto: formData.email,
+          // Honeypot protection
+          botcheck: false,
+          // Add Turnstile token if available
+          ...(turnstileToken && { 'cf-turnstile-response': turnstileToken })
         })
       });
 
       const result = await response.json();
       
       if (result.success) {
-        alert('Thank you for your inquiry! We will contact you shortly.');
+        setSubmitStatus('success');
         setFormData({ name: '', email: '', phone: '', company: '', message: '' });
+        
+        // Scroll to success message
+        setTimeout(() => {
+          const contactSection = document.getElementById('contact');
+          if (contactSection) {
+            const formElement = contactSection.querySelector('.bg-white\\/5');
+            if (formElement) {
+              formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }
+        }, 100);
       } else {
-        alert('There was an error submitting your form. Please try again or contact us directly at info@integrosystems.co.za');
+        setSubmitStatus('error');
+        setErrorMessage(result.message || 'There was an error submitting your form. Please try again.');
       }
     } catch (error) {
-      alert('There was an error submitting your form. Please try again or contact us directly at info@integrosystems.co.za');
+      console.error('Form submission error:', error);
+      setSubmitStatus('error');
+      setErrorMessage('There was an error submitting your form. Please try again or contact us directly at support@integrosystems.co.za');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (submitStatus === 'error') {
+      setSubmitStatus(null);
+      setErrorMessage('');
     }
   };
 
@@ -159,7 +223,7 @@ export default function IntegroSystems() {
     return [ref, isInView];
   };
 
-  // Count-up animation for stats - FIXED to prevent duplicate symbols
+  // Count-up animation for stats
   const useCountUp = (end, duration = 2000, isInView) => {
     const [count, setCount] = useState(0);
     const [isDecimal, setIsDecimal] = useState(false);
@@ -167,12 +231,10 @@ export default function IntegroSystems() {
     useEffect(() => {
       if (!isInView) return;
 
-      // Extract numeric value from string
       let numericEnd;
       let hasDecimal = false;
 
       if (typeof end === 'string') {
-        // Remove all non-numeric characters except decimal point
         const numStr = end.replace(/[^\d.]/g, '');
         numericEnd = parseFloat(numStr);
         hasDecimal = numStr.includes('.');
@@ -318,7 +380,6 @@ export default function IntegroSystems() {
       const value = stat.value;
       const displayCount = isDecimal ? count.toFixed(1) : count;
       
-      // Add appropriate symbols based on original value
       if (typeof value === 'string') {
         if (value.includes('%')) {
           return displayCount + '%';
@@ -725,7 +786,7 @@ export default function IntegroSystems() {
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-teal-400/50 transition-all duration-300 hover:scale-105 group">
               <Phone className="w-8 h-8 text-teal-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
               <h3 className="font-bold mb-2">Phone</h3>
-              <p className="text-gray-300">+27674148908</p>
+              <p className="text-gray-300">+27 67 414 8908</p>
             </div>
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-teal-400/50 transition-all duration-300 hover:scale-105 group">
               <Mail className="w-8 h-8 text-teal-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
@@ -751,56 +812,112 @@ export default function IntegroSystems() {
 
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
             <h3 className="text-2xl font-bold mb-6">Request Your Complimentary IT Assessment</h3>
+            
+            {/* Success Message */}
+            {submitStatus === 'success' && (
+              <div className="mb-6 p-5 bg-gradient-to-r from-green-500/20 to-teal-500/20 border-2 border-green-400/50 rounded-xl backdrop-blur-sm animate-fadeIn">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-7 h-7 text-green-400 flex-shrink-0" />
+                  <div className="text-left">
+                    <p className="font-bold text-green-300 text-lg">Thank you for your inquiry!</p>
+                    <p className="text-sm text-green-200 mt-1">We'll contact you within 24 hours to discuss your IT requirements.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {submitStatus === 'error' && (
+              <div className="mb-6 p-5 bg-gradient-to-r from-red-500/20 to-orange-500/20 border-2 border-red-400/50 rounded-xl backdrop-blur-sm animate-fadeIn">
+                <div className="flex items-center gap-3">
+                  <AlertCircle className="w-7 h-7 text-red-400 flex-shrink-0" />
+                  <div className="text-left">
+                    <p className="font-bold text-red-300 text-lg">Please check your information</p>
+                    <p className="text-sm text-red-200 mt-1">{errorMessage}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Honeypot field - hidden from users */}
+              <input 
+                type="checkbox" 
+                name="botcheck" 
+                className="hidden" 
+                style={{ display: 'none' }}
+                tabIndex="-1"
+                autoComplete="off"
+              />
+
               <div className="grid md:grid-cols-2 gap-4">
                 <input 
                   type="text" 
+                  name="name"
                   placeholder="Full Name *" 
                   value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
+                  disabled={submitting}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <input 
                   type="email" 
+                  name="email"
                   placeholder="Business Email *" 
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
+                  disabled={submitting}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 />
               </div>
               <input 
                 type="tel" 
+                name="phone"
                 placeholder="Contact Number *" 
                 value={formData.phone}
-                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                onChange={handleChange}
                 required
-                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
+                disabled={submitting}
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <input 
                 type="text" 
+                name="company"
                 placeholder="Company Name" 
                 value={formData.company}
-                onChange={(e) => setFormData({...formData, company: e.target.value})}
-                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
+                onChange={handleChange}
+                disabled={submitting}
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <textarea 
+                name="message"
                 placeholder="Describe your IT requirements... *" 
                 rows="4"
                 value={formData.message}
-                onChange={(e) => setFormData({...formData, message: e.target.value})}
+                onChange={handleChange}
                 required
-                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all resize-none"
+                disabled={submitting}
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all resize-none disabled:opacity-50 disabled:cursor-not-allowed"
               ></textarea>
+              
               <button 
                 type="submit"
-                className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white px-8 py-4 rounded-lg font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 group"
+                disabled={submitting}
+                className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white px-8 py-4 rounded-lg font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
-                <span className="flex items-center justify-center space-x-2">
-                  <span>Submit Inquiry</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </span>
+                {submitting ? (
+                  <span className="flex items-center justify-center space-x-2">
+                    <Loader className="w-5 h-5 animate-spin" />
+                    <span>Sending...</span>
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center space-x-2">
+                    <span>Submit Inquiry</span>
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                )}
               </button>
             </form>
           </div>
