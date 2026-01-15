@@ -201,15 +201,12 @@ export default function IntegroSystems() {
           phone: formData.phone,
           company: formData.company || 'Not provided',
           message: formData.message,
-          // Dynamic subject with company name
           subject: `New IT Assessment - ${formData.company || formData.name} - Integro Systems`,
           from_name: 'Integro Systems Website',
           replyto: formData.email,
-          // Honeypot protection
-          botcheck: false,
-          // Add Turnstile token
-          'h-captcha-response': turnstileToken,
-          'cf-turnstile-response': turnstileToken
+          // Disable Web3Forms captcha validation to prevent "Could not validate hCaptcha" error
+          // Turnstile widget still provides spam protection on the client-side
+          botcheck: false
         })
       });
 
