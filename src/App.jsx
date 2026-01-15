@@ -607,10 +607,13 @@ const handleSubmit = async (e) => {
                 } relative group`}
               >
                 {pkg.highlighted && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg animate-bounce">
-                    Most Popular
-                  </div>
-                )}
+  <div
+    className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg animate-bounce"
+    style={{ transform: 'translateX(-50%)' }}
+  >
+    Most Popular
+  </div>
+)}
                 <div className={`w-full h-6 bg-gradient-to-r ${pkg.color} rounded-full mb-6 group-hover:h-7 transition-all duration-300 shadow-2xl ring-2 ring-white/10`} style={{opacity: 1}}></div>
                 <h3 className="text-2xl font-bold mb-2 text-white">{pkg.name}</h3>
                 <p className="text-gray-300 mb-6">{pkg.description}</p>
