@@ -892,13 +892,12 @@ export default function IntegroSystems() {
               ></textarea>
               
               {/* Cloudflare Turnstile Widget - Web3Forms automatically handles validation */}
-              <div className="flex justify-center my-6">
-                <div 
-                  className="cf-turnstile" 
-                  data-sitekey="0x4AAAAAACMrxA4X4MrL5wYR"
-                  data-theme="dark"
-                ></div>
-              </div>
+             <div
+    className="cf-turnstile"
+    data-sitekey="0x4AAAAAACMrxA4X4MrL5wYR"
+    data-theme="dark"
+  ></div>
+
               
               <button 
                 type="submit"
