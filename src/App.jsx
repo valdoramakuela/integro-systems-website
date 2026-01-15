@@ -72,6 +72,9 @@ export default function IntegroSystems() {
   const [submitting, setSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null); // 'success' or 'error'
   const [errorMessage, setErrorMessage] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState(null);
+  const turnstileRef = useRef(null);
+  const widgetIdRef = useRef(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -86,6 +89,62 @@ export default function IntegroSystems() {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Initialize Turnstile when component mounts
+  useEffect(() => {
+    const initTurnstile = () => {
+      if (window.turnstile && turnstileRef.current && !widgetIdRef.current) {
+        try {
+          widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
+            sitekey: '0x4AAAAAACMrxA4X4MrL5wYR',
+            theme: 'dark',
+            size: 'normal',
+            callback: (token) => {
+              console.log('Turnstile token received');
+              setTurnstileToken(token);
+            },
+            'error-callback': (error) => {
+              console.error('Turnstile error:', error);
+              setErrorMessage('Security verification failed. Please refresh and try again.');
+              setSubmitStatus('error');
+            },
+            'expired-callback': () => {
+              console.log('Turnstile token expired');
+              setTurnstileToken(null);
+            }
+          });
+        } catch (error) {
+          console.error('Error rendering Turnstile:', error);
+        }
+      }
+    };
+
+    // Check if Turnstile is already loaded
+    if (window.turnstile) {
+      initTurnstile();
+    } else {
+      // Wait for Turnstile to load
+      const checkTurnstile = setInterval(() => {
+        if (window.turnstile) {
+          clearInterval(checkTurnstile);
+          initTurnstile();
+        }
+      }, 100);
+
+      return () => clearInterval(checkTurnstile);
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (window.turnstile && widgetIdRef.current) {
+        try {
+          window.turnstile.remove(widgetIdRef.current);
+        } catch (error) {
+          console.error('Error removing Turnstile:', error);
+        }
+      }
+    };
   }, []);
 
   const handleSubmit = async (e) => {
@@ -120,17 +179,15 @@ export default function IntegroSystems() {
       return;
     }
 
-    try {
-      // Get Cloudflare Turnstile token if available
-      let turnstileToken = null;
-      if (window.turnstile) {
-        try {
-          turnstileToken = await window.turnstile.execute();
-        } catch (error) {
-          console.log('Turnstile not loaded, continuing without it');
-        }
-      }
+    // Check for Turnstile token
+    if (!turnstileToken) {
+      setSubmitStatus('error');
+      setErrorMessage('Please complete the security verification');
+      setSubmitting(false);
+      return;
+    }
 
+    try {
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: {
@@ -150,8 +207,9 @@ export default function IntegroSystems() {
           replyto: formData.email,
           // Honeypot protection
           botcheck: false,
-          // Add Turnstile token if available
-          ...(turnstileToken && { 'cf-turnstile-response': turnstileToken })
+          // Add Turnstile token
+          'h-captcha-response': turnstileToken,
+          'cf-turnstile-response': turnstileToken
         })
       });
 
@@ -160,6 +218,12 @@ export default function IntegroSystems() {
       if (result.success) {
         setSubmitStatus('success');
         setFormData({ name: '', email: '', phone: '', company: '', message: '' });
+        
+        // Reset Turnstile
+        if (window.turnstile && widgetIdRef.current) {
+          window.turnstile.reset(widgetIdRef.current);
+        }
+        setTurnstileToken(null);
         
         // Scroll to success message
         setTimeout(() => {
@@ -174,11 +238,23 @@ export default function IntegroSystems() {
       } else {
         setSubmitStatus('error');
         setErrorMessage(result.message || 'There was an error submitting your form. Please try again.');
+        
+        // Reset Turnstile on error
+        if (window.turnstile && widgetIdRef.current) {
+          window.turnstile.reset(widgetIdRef.current);
+        }
+        setTurnstileToken(null);
       }
     } catch (error) {
       console.error('Form submission error:', error);
       setSubmitStatus('error');
       setErrorMessage('There was an error submitting your form. Please try again or contact us directly at support@integrosystems.co.za');
+      
+      // Reset Turnstile on error
+      if (window.turnstile && widgetIdRef.current) {
+        window.turnstile.reset(widgetIdRef.current);
+      }
+      setTurnstileToken(null);
     } finally {
       setSubmitting(false);
     }
@@ -902,9 +978,14 @@ export default function IntegroSystems() {
                 className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all resize-none disabled:opacity-50 disabled:cursor-not-allowed"
               ></textarea>
               
+              {/* Turnstile Widget */}
+              <div className="flex justify-center my-6">
+                <div ref={turnstileRef} id="turnstile-widget"></div>
+              </div>
+              
               <button 
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || !turnstileToken}
                 className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white px-8 py-4 rounded-lg font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {submitting ? (
