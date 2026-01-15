@@ -90,89 +90,92 @@ export default function IntegroSystems() {
 
 
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setSubmitStatus(null);
-    setErrorMessage('');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setSubmitting(true);
+  setSubmitStatus(null);
+  setErrorMessage('');
 
-    // Validation
-    if (!formData.name || !formData.email || !formData.phone || !formData.message) {
-      setSubmitStatus('error');
-      setErrorMessage('Please fill in all required fields: Name, Email, Contact Number, and Requirements');
-      setSubmitting(false);
-      return;
-    }
+  // Validation
+  if (!formData.name || !formData.email || !formData.phone || !formData.message) {
+    setSubmitStatus('error');
+    setErrorMessage('Please fill in all required fields: Name, Email, Contact Number, and Requirements');
+    setSubmitting(false);
+    return;
+  }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setSubmitStatus('error');
-      setErrorMessage('Please enter a valid email address');
-      setSubmitting(false);
-      return;
-    }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(formData.email)) {
+    setSubmitStatus('error');
+    setErrorMessage('Please enter a valid email address');
+    setSubmitting(false);
+    return;
+  }
 
-    // Phone validation (basic)
-    const phoneRegex = /^[\d\s\+\-\(\)]+$/;
-    if (!phoneRegex.test(formData.phone)) {
-      setSubmitStatus('error');
-      setErrorMessage('Please enter a valid phone number');
-      setSubmitting(false);
-      return;
-    }
+  const phoneRegex = /^[\d\s\+\-\(\)]+$/;
+  if (!phoneRegex.test(formData.phone)) {
+    setSubmitStatus('error');
+    setErrorMessage('Please enter a valid phone number');
+    setSubmitting(false);
+    return;
+  }
 
-    try {
-      const response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          access_key: 'a35af147-667e-431e-973d-64375fb18ea5',
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          company: formData.company || 'Not provided',
-          message: formData.message,
-          subject: `New IT Assessment - ${formData.company || formData.name} - Integro Systems`,
-          from_name: 'Integro Systems Website',
-          replyto: formData.email
-          // Note: Web3Forms automatically extracts Turnstile token from cf-turnstile div
-          // No need to manually include captcha tokens
-        })
-      });
+  // ✅ Manually get the Turnstile token
+  const captchaToken = document.querySelector('input[name="cf-turnstile-response"]')?.value;
+  if (!captchaToken) {
+    setSubmitStatus('error');
+    setErrorMessage('CAPTCHA verification failed. Please wait for the badge to appear and try again.');
+    setSubmitting(false);
+    return;
+  }
 
-      const result = await response.json();
-      
-      if (result.success) {
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', phone: '', company: '', message: '' });
-        
-        // Scroll to success message
-        setTimeout(() => {
-          const contactSection = document.getElementById('contact');
-          if (contactSection) {
-            const formElement = contactSection.querySelector('.bg-white\\/5');
-            if (formElement) {
-              formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+  try {
+    const response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        access_key: 'a35af147-667e-431e-973d-64375fb18ea5',
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        company: formData.company || 'Not provided',
+        message: formData.message,
+        subject: `New IT Assessment - ${formData.company || formData.name} - Integro Systems`,
+        from_name: 'Integro Systems Website',
+        replyto: formData.email,
+        // ✅ Include the CAPTCHA token manually
+        'cf-turnstile-response': captchaToken
+      })
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      setSubmitStatus('success');
+      setFormData({ name: '', email: '', phone: '', company: '', message: '' });
+      setTimeout(() => {
+        const contactSection = document.getElementById('contact');
+        if (contactSection) {
+          const formElement = contactSection.querySelector('.bg-white\\/5');
+          if (formElement) {
+            formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
-        }, 100);
-      } else {
-        setSubmitStatus('error');
-        setErrorMessage(result.message || 'There was an error submitting your form. Please try again.');
-      }
-    } catch (error) {
-      console.error('Form submission error:', error);
+        }
+      }, 100);
+    } else {
       setSubmitStatus('error');
-      setErrorMessage('There was an error submitting your form. Please try again or contact us directly at support@integrosystems.co.za');
-    } finally {
-      setSubmitting(false);
+      setErrorMessage(result.message || 'There was an error submitting your form. Please try again.');
     }
-  };
-
+  } catch (error) {
+    console.error('Form submission error:', error);
+    setSubmitStatus('error');
+    setErrorMessage('There was an error submitting your form. Please try again or contact us directly at support@integrosystems.co.za');
+  } finally {
+    setSubmitting(false);
+  }
+};
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
