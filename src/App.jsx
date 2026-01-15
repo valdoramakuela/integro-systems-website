@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Shield, Server, Zap, CheckCircle, Menu, X, ArrowRight, Mail, Phone, MapPin, Clock, Users, Lock, Cpu, Cloud, MessageCircle, AlertCircle, Loader } from 'lucide-react';
 
-// Feature Card Component with animation
+// Feature Card Component with animationmost
 const FeatureCard = ({ icon: Icon, title, description, color, delay }) => {
   const [ref, setRef] = useState(null);
   const [isInView, setIsInView] = useState(false);
@@ -606,6 +606,7 @@ const handleSubmit = async (e) => {
                     : 'bg-transparent border-white/20 hover:border-teal-400/50'
                 } relative group`}
               >
+
                 {pkg.highlighted && (
   <div
     className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg animate-bounce"
