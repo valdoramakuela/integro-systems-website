@@ -88,43 +88,7 @@ export default function IntegroSystems() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Add this near your other useEffects (e.g., after the scroll handler)
-useEffect(() => {
-  const renderTurnstile = () => {
-    const container = document.querySelector('.cf-turnstile');
-    // Only render if container exists and hasn't been rendered yet
-    if (container && !container.hasChildNodes() && window.turnstile) {
-      window.turnstile.render(container, {
-        sitekey: '0x4AAAAAACMrxA4X4MrL5wYR',
-        theme: 'dark',
-        // Optional: callback if you ever need the token manually
-        // callback: (token) => console.log('Turnstile token:', token)
-      });
-    }
-  };
 
-  // If Turnstile script already loaded, render immediately
-  if (window.turnstile) {
-    renderTurnstile();
-  } else {
-    // Otherwise, wait for it
-    const script = document.createElement('script');
-    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
-    script.async = true;
-    script.onload = renderTurnstile;
-    document.head.appendChild(script);
-  }
-
-  // Cleanup on unmount (optional but good practice)
-  return () => {
-    const containers = document.querySelectorAll('.cf-turnstile');
-    containers.forEach(container => {
-      if (container.firstChild) {
-        container.removeChild(container.firstChild);
-      }
-    });
-  };
-}, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
