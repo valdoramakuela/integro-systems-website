@@ -783,7 +783,7 @@ const handleSubmit = async (e) => {
             <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-teal-400/50 transition-all duration-300 hover:scale-105 group">
               <Mail className="w-8 h-8 text-teal-400 mx-auto mb-4 group-hover:scale-110 transition-transform" />
               <h3 className="font-bold mb-2">Email</h3>
-              <p className="text-gray-300">support@integrosystems.co.za</p>
+              <p className="text-gray-300 break-words text-sm">support@integrosystems.co.za</p>
             </div>
             <a 
               href="https://wa.me/27674148908" 
