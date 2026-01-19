@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Shield, Server, Zap, CheckCircle, Menu, X, ArrowRight, Mail, Phone, MapPin, Clock, Users, Lock, Cpu, Cloud, MessageCircle, AlertCircle, Loader } from 'lucide-react';
 
-// Feature Card Component with animationmost
+// Feature Card Component with animation
 const FeatureCard = ({ icon: Icon, title, description, color, delay }) => {
   const [ref, setRef] = useState(null);
   const [isInView, setIsInView] = useState(false);
@@ -70,8 +70,12 @@ export default function IntegroSystems() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null); // 'success' or 'error'
+  const [submitStatus, setSubmitStatus] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const [turnstileWidgetId, setTurnstileWidgetId] = useState(null);
+  const [turnstileLoaded, setTurnstileLoaded] = useState(false);
+  const turnstileRef = useRef(null);
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -88,101 +92,261 @@ export default function IntegroSystems() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Load Turnstile script dynamically
+  useEffect(() => {
+    const existingScript = document.querySelector('script[src*="challenges.cloudflare.com/turnstile"]');
+    
+    if (existingScript) {
+      if (window.turnstile) {
+        setTurnstileLoaded(true);
+      } else {
+        existingScript.addEventListener('load', () => {
+          setTurnstileLoaded(true);
+        });
+      }
+      return;
+    }
 
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    script.async = true;
+    script.defer = true;
+    
+    script.onload = () => {
+      console.log('✅ Turnstile script loaded successfully');
+      setTurnstileLoaded(true);
+    };
+    
+    script.onerror = () => {
+      console.error('❌ Failed to load Turnstile script');
+      setSubmitStatus('error');
+      setErrorMessage('Security verification failed to load. Please refresh the page.');
+    };
+    
+    document.head.appendChild(script);
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setSubmitting(true);
-  setSubmitStatus(null);
-  setErrorMessage('');
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
+  }, []);
 
-  // Validation
-  if (!formData.name || !formData.email || !formData.phone || !formData.message) {
-    setSubmitStatus('error');
-    setErrorMessage('Please fill in all required fields: Name, Email, Contact Number, and Requirements');
-    setSubmitting(false);
-    return;
-  }
+  // Initialize Turnstile widget when script is loaded
+  useEffect(() => {
+    if (!turnstileLoaded || !turnstileRef.current) {
+      return;
+    }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(formData.email)) {
-    setSubmitStatus('error');
-    setErrorMessage('Please enter a valid email address');
-    setSubmitting(false);
-    return;
-  }
+    // Clear any existing widget
+    if (turnstileWidgetId !== null && window.turnstile) {
+      try {
+        window.turnstile.remove(turnstileWidgetId);
+        console.log('🗑️ Removed old Turnstile widget');
+      } catch (e) {
+        console.log('No widget to remove');
+      }
+    }
 
-  const phoneRegex = /^[\d\s\+\-\(\)]+$/;
-  if (!phoneRegex.test(formData.phone)) {
-    setSubmitStatus('error');
-    setErrorMessage('Please enter a valid phone number');
-    setSubmitting(false);
-    return;
-  }
+    // Clear the container
+    if (turnstileRef.current) {
+      turnstileRef.current.innerHTML = '';
+    }
 
-  // ✅ Manually get the Turnstile token
-  const captchaToken = document.querySelector('input[name="cf-turnstile-response"]')?.value;
-  if (!captchaToken) {
-    setSubmitStatus('error');
-    setErrorMessage('CAPTCHA verification failed. Please wait for the badge to appear and try again.');
-    setSubmitting(false);
-    return;
-  }
-
-  try {
-    const response = await fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        access_key: 'a35af147-667e-431e-973d-64375fb18ea5',
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        company: formData.company || 'Not provided',
-        message: formData.message,
-        subject: `New IT Assessment - ${formData.company || formData.name} - Integro Systems`,
-        from_name: 'Integro Systems Website',
-        replyto: formData.email,
-        // ✅ Include the CAPTCHA token manually
-        'cf-turnstile-response': captchaToken
-      })
-    });
-
-    const result = await response.json();
-    if (result.success) {
-      setSubmitStatus('success');
-      setFormData({ name: '', email: '', phone: '', company: '', message: '' });
-      setTimeout(() => {
-        const contactSection = document.getElementById('contact');
-        if (contactSection) {
-          const formElement = contactSection.querySelector('.bg-white\\/5');
-          if (formElement) {
-            formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Render new widget
+    try {
+      console.log('🔄 Rendering Turnstile widget...');
+      const widgetId = window.turnstile.render(turnstileRef.current, {
+        sitekey: '0x4AAAAAACMrxA4X4MrL5wYR',
+        theme: 'dark',
+        callback: function(token) {
+          console.log('✅ Turnstile verified successfully');
+        },
+        'error-callback': function() {
+          console.error('❌ Turnstile verification error');
+          setSubmitStatus('error');
+          setErrorMessage('CAPTCHA verification failed. Please refresh the page and try again.');
+        },
+        'expired-callback': function() {
+          console.log('⏰ Turnstile token expired, resetting...');
+          if (window.turnstile && widgetId !== null) {
+            window.turnstile.reset(widgetId);
+          }
+        },
+        'timeout-callback': function() {
+          console.log('⏱️ Turnstile timeout, resetting...');
+          if (window.turnstile && widgetId !== null) {
+            window.turnstile.reset(widgetId);
           }
         }
-      }, 100);
-    } else {
+      });
+      
+      setTurnstileWidgetId(widgetId);
+      console.log('✅ Turnstile widget rendered with ID:', widgetId);
+    } catch (error) {
+      console.error('❌ Error rendering Turnstile widget:', error);
       setSubmitStatus('error');
-      setErrorMessage(result.message || 'There was an error submitting your form. Please try again.');
+      setErrorMessage('Failed to initialize security verification. Please refresh the page.');
     }
-  } catch (error) {
-    console.error('Form submission error:', error);
-    setSubmitStatus('error');
-    setErrorMessage('There was an error submitting your form. Please try again or contact us directly at support@integrosystems.co.za');
-  } finally {
-    setSubmitting(false);
-  }
-};
+
+    return () => {
+      if (turnstileWidgetId !== null && window.turnstile) {
+        try {
+          window.turnstile.remove(turnstileWidgetId);
+        } catch (e) {
+          console.log('Widget cleanup completed');
+        }
+      }
+    };
+  }, [turnstileLoaded]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setSubmitStatus(null);
+    setErrorMessage('');
+
+    // Validation
+    if (!formData.name || !formData.email || !formData.phone || !formData.message) {
+      setSubmitStatus('error');
+      setErrorMessage('Please fill in all required fields: Name, Email, Contact Number, and Requirements');
+      setSubmitting(false);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setSubmitStatus('error');
+      setErrorMessage('Please enter a valid email address');
+      setSubmitting(false);
+      return;
+    }
+
+    const phoneRegex = /^[\d\s\+\-\(\)]+$/;
+    if (!phoneRegex.test(formData.phone)) {
+      setSubmitStatus('error');
+      setErrorMessage('Please enter a valid phone number');
+      setSubmitting(false);
+      return;
+    }
+
+    // Get the Turnstile token
+    const captchaToken = document.querySelector('input[name="cf-turnstile-response"]')?.value;
+    
+    if (!captchaToken) {
+      setSubmitStatus('error');
+      setErrorMessage('Please wait for the security verification to complete and try again.');
+      setSubmitting(false);
+      
+      // Try to reset the widget
+      if (turnstileWidgetId !== null && window.turnstile) {
+        try {
+          window.turnstile.reset(turnstileWidgetId);
+        } catch (e) {
+          console.error('Failed to reset Turnstile:', e);
+        }
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          access_key: 'a35af147-667e-431e-973d-64375fb18ea5',
+          
+          // Enhanced email formatting with emojis
+          subject: `🚀 NEW IT ASSESSMENT REQUEST - ${formData.company || formData.name}`,
+          from_name: 'Integro Systems Website',
+          replyto: formData.email,
+          
+          // Primary contact info with emojis for better email readability
+          '👤 Contact Name': formData.name,
+          '🏢 Company': formData.company || 'Not Provided',
+          '📧 Email': formData.email,
+          '📱 Phone': formData.phone,
+          '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━': '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+          '💼 IT REQUIREMENTS': formData.message,
+          '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ': '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+          '⚡ Priority': 'HIGH',
+          '📍 Lead Source': 'Website Contact Form',
+          '🕐 Submitted': new Date().toLocaleString('en-ZA', { 
+            timeZone: 'Africa/Johannesburg',
+            dateStyle: 'full',
+            timeStyle: 'short'
+          }),
+          
+          // CAPTCHA token
+          'cf-turnstile-response': captchaToken
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setSubmitStatus('success');
+        setFormData({ name: '', email: '', phone: '', company: '', message: '' });
+        
+        // Reset Turnstile widget after successful submission
+        if (turnstileWidgetId !== null && window.turnstile) {
+          try {
+            window.turnstile.reset(turnstileWidgetId);
+            console.log('✅ Turnstile widget reset after successful submission');
+          } catch (e) {
+            console.error('Failed to reset Turnstile:', e);
+          }
+        }
+        
+        setTimeout(() => {
+          const contactSection = document.getElementById('contact');
+          if (contactSection) {
+            const formElement = contactSection.querySelector('.bg-white\\/5');
+            if (formElement) {
+              formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }
+        }, 100);
+      } else {
+        setSubmitStatus('error');
+        setErrorMessage(result.message || 'There was an error submitting your form. Please try again.');
+        
+        // Reset Turnstile widget after error
+        if (turnstileWidgetId !== null && window.turnstile) {
+          try {
+            window.turnstile.reset(turnstileWidgetId);
+          } catch (e) {
+            console.error('Failed to reset Turnstile:', e);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setSubmitStatus('error');
+      setErrorMessage('There was an error submitting your form. Please try again or contact us directly at support@integrosystems.co.za');
+      
+      // Reset Turnstile widget after error
+      if (turnstileWidgetId !== null && window.turnstile) {
+        try {
+          window.turnstile.reset(turnstileWidgetId);
+        } catch (e) {
+          console.error('Failed to reset Turnstile:', e);
+        }
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
     if (submitStatus === 'error') {
       setSubmitStatus(null);
       setErrorMessage('');
@@ -606,14 +770,13 @@ const handleSubmit = async (e) => {
                     : 'bg-transparent border-white/20 hover:border-teal-400/50'
                 } relative group`}
               >
-  {pkg.highlighted && (
-  <div className="absolute -top-4 inset-x-0 flex justify-center z-10">
-    <span className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg animate-bounce">
-      Most Popular
-    </span>
-  </div>
-)}
-
+                {pkg.highlighted && (
+                  <div className="absolute -top-4 inset-x-0 flex justify-center z-10">
+                    <span className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white px-6 py-1.5 rounded-full text-sm font-bold shadow-lg animate-bounce">
+                      Most Popular
+                    </span>
+                  </div>
+                )}
           
                 <div className={`w-full h-6 bg-gradient-to-r ${pkg.color} rounded-full mb-6 group-hover:h-7 transition-all duration-300 shadow-2xl ring-2 ring-white/10`} style={{opacity: 1}}></div>
                 <h3 className="text-2xl font-bold mb-2 text-white">{pkg.name}</h3>
@@ -836,7 +999,7 @@ const handleSubmit = async (e) => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Honeypot field - hidden from users */}
+              {/* Honeypot field */}
               <input 
                 type="checkbox" 
                 name="botcheck" 
@@ -898,17 +1061,18 @@ const handleSubmit = async (e) => {
                 className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all resize-none disabled:opacity-50 disabled:cursor-not-allowed"
               ></textarea>
               
-              {/* Cloudflare Turnstile Widget - Web3Forms automatically handles validation */}
-             <div
-    className="cf-turnstile"
-    data-sitekey="0x4AAAAAACMrxA4X4MrL5wYR"
-    data-theme="dark"
-  ></div>
-
+              {/* Turnstile Container - Now using explicit render with ref */}
+              <div className="flex justify-center min-h-[65px]">
+                <div ref={turnstileRef}></div>
+              </div>
+              
+              {!turnstileLoaded && (
+                <p className="text-sm text-gray-400 text-center">Loading security verification...</p>
+              )}
               
               <button 
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || !turnstileLoaded}
                 className="w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white px-8 py-4 rounded-lg font-bold text-lg hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 group disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {submitting ? (
