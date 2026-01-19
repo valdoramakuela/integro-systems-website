@@ -249,6 +249,12 @@ const handleSubmit = async (e) => {
     return;
   }
 
+  const timestamp = new Date().toLocaleString('en-ZA', { 
+    timeZone: 'Africa/Johannesburg',
+    dateStyle: 'full',
+    timeStyle: 'short'
+  });
+
   try {
     const response = await fetch('https://api.web3forms.com/submit', {
       method: 'POST',
@@ -274,201 +280,62 @@ const handleSubmit = async (e) => {
         '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ': '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
         '⚡ Priority': 'HIGH',
         '📍 Lead Source': 'Website Contact Form',
-        '🕐 Submitted': new Date().toLocaleString('en-ZA', { 
-          timeZone: 'Africa/Johannesburg',
-          dateStyle: 'full',
-          timeStyle: 'short'
-        }),
+        '🕐 Submitted': timestamp,
         
         // CAPTCHA token
         'cf-turnstile-response': captchaToken,
         
-        // ✅ AUTO-RESPONSE - Send confirmation email to the person who submitted
-        autoresponse: true,
-        
-        // Custom auto-response subject line
-        'autoresponse.subject': 'Thank You for Contacting Integro Systems - We\'ll Be In Touch Soon!',
-        
-        // Custom auto-response message (HTML supported)
-        'autoresponse.message': `
-<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background-color: #f3f4f6;
-      margin: 0;
-      padding: 20px;
-      line-height: 1.6;
-    }
-    .email-wrapper {
-      max-width: 600px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      background: linear-gradient(135deg, #3b82f6 0%, #14b8a6 100%);
-      padding: 40px 30px;
-      text-align: center;
-    }
-    .header img {
-      max-height: 60px;
-      margin-bottom: 15px;
-    }
-    .header h1 {
-      color: white;
-      margin: 0;
-      font-size: 28px;
-      font-weight: 700;
-    }
-    .header p {
-      color: #e0f2fe;
-      margin: 8px 0 0;
-      font-size: 14px;
-    }
-    .content {
-      padding: 40px 30px;
-    }
-    .greeting {
-      font-size: 18px;
-      color: #1e293b;
-      margin-bottom: 20px;
-    }
-    .message {
-      color: #475569;
-      margin-bottom: 25px;
-      font-size: 15px;
-    }
-    .info-box {
-      background: #f1f5f9;
-      border-left: 4px solid #14b8a6;
-      padding: 20px;
-      border-radius: 8px;
-      margin: 25px 0;
-    }
-    .info-box h3 {
-      margin: 0 0 15px 0;
-      color: #1e293b;
-      font-size: 16px;
-    }
-    .info-item {
-      margin: 8px 0;
-      color: #475569;
-    }
-    .info-label {
-      font-weight: 600;
-      color: #1e293b;
-    }
-    .contact-box {
-      background: linear-gradient(135deg, #3b82f6 0%, #14b8a6 100%);
-      color: white;
-      padding: 25px;
-      border-radius: 12px;
-      margin: 25px 0;
-      text-align: center;
-    }
-    .contact-box h3 {
-      margin: 0 0 15px 0;
-      font-size: 18px;
-    }
-    .contact-item {
-      margin: 10px 0;
-      font-size: 15px;
-    }
-    .contact-item a {
-      color: white;
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .footer {
-      background: #0f172a;
-      color: #94a3b8;
-      padding: 30px;
-      text-align: center;
-      font-size: 13px;
-    }
-    .footer strong {
-      color: #cbd5e1;
-    }
-    .checkmark {
-      color: #10b981;
-      font-size: 48px;
-      text-align: center;
-      margin: 20px 0;
-    }
-  </style>
-</head>
-<body>
-  <div class="email-wrapper">
-    <div class="header">
-      <img src="https://i.postimg.cc/mrNHcz4K/copy-reduced-logo-removebg-preview.png" alt="Integro Systems">
-      <h1>Thank You for Your Inquiry!</h1>
-      <p>We've received your IT assessment request</p>
-    </div>
-    
-    <div class="content">
-      <div class="checkmark">✓</div>
-      
-      <div class="greeting">
-        Hi ${formData.name},
-      </div>
-      
-      <div class="message">
-        Thank you for reaching out to Integro Systems! We've successfully received your IT assessment request and our team is reviewing your requirements.
-      </div>
-      
-      <div class="message">
-        <strong>What happens next?</strong><br>
-        One of our IT specialists will contact you within <strong>24 hours</strong> to discuss your specific needs and how we can help optimize your business technology infrastructure.
-      </div>
-      
-      <div class="info-box">
-        <h3>📋 Your Submission Details:</h3>
-        <div class="info-item"><span class="info-label">Name:</span> ${formData.name}</div>
-        <div class="info-item"><span class="info-label">Company:</span> ${formData.company || 'Not Provided'}</div>
-        <div class="info-item"><span class="info-label">Email:</span> ${formData.email}</div>
-        <div class="info-item"><span class="info-label">Phone:</span> ${formData.phone}</div>
-        <div class="info-item"><span class="info-label">Submitted:</span> ${new Date().toLocaleString('en-ZA', { 
-          timeZone: 'Africa/Johannesburg',
-          dateStyle: 'full',
-          timeStyle: 'short'
-        })}</div>
-      </div>
-      
-      <div class="contact-box">
-        <h3>Need Immediate Assistance?</h3>
-        <div class="contact-item">📞 <a href="tel:+27674148908">+27 67 414 8908</a></div>
-        <div class="contact-item">📧 <a href="mailto:support@integrosystems.co.za">support@integrosystems.co.za</a></div>
-        <div class="contact-item">💬 <a href="https://wa.me/27674148908">WhatsApp Us</a></div>
-      </div>
-      
-      <div class="message">
-        We look forward to partnering with you to deliver enterprise-grade IT solutions that drive your business forward.
-      </div>
-      
-      <div class="message" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
-        <strong>Best regards,</strong><br>
-        The Integro Systems Team<br>
-        <em>Enterprise IT Support, Automation & Security Solutions</em>
-      </div>
-    </div>
-    
-    <div class="footer">
-      <p><strong>Integro Systems</strong></p>
-      <p>Pretoria, South Africa</p>
-      <p style="margin-top: 15px; font-size: 12px;">
-        This is an automated confirmation email. Please do not reply directly to this message.
-      </p>
-      <p style="margin-top: 5px;">© 2026 Integro Systems. All rights reserved.</p>
-    </div>
-  </div>
-</body>
-</html>
-        `
+        // ✅ AUTO-RESPONSE CONFIGURATION - This sends a separate email to the contact
+        autoresponse: {
+          subject: `Thank You for Contacting Integro Systems - We'll Be In Touch Soon!`,
+          message: `
+Hi ${formData.name},
+
+Thank you for reaching out to Integro Systems! We've successfully received your IT assessment request and our team is reviewing your requirements.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 YOUR SUBMISSION DETAILS:
+
+Name: ${formData.name}
+Company: ${formData.company || 'Not Provided'}
+Email: ${formData.email}
+Phone: ${formData.phone}
+Submitted: ${timestamp}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+WHAT HAPPENS NEXT?
+
+One of our IT specialists will contact you within 24 hours to discuss your specific needs and how we can help optimize your business technology infrastructure.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+NEED IMMEDIATE ASSISTANCE?
+
+📞 Phone: +27 67 414 8908
+📧 Email: support@integrosystems.co.za
+💬 WhatsApp: https://wa.me/27674148908
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+We look forward to partnering with you to deliver enterprise-grade IT solutions that drive your business forward.
+
+Best regards,
+The Integro Systems Team
+Enterprise IT Support, Automation & Security Solutions
+
+Pretoria, South Africa
+www.integrosystems.co.za
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+This is an automated confirmation email. Please do not reply directly to this message.
+If you have any questions, please contact us at support@integrosystems.co.za
+
+© 2026 Integro Systems. All rights reserved.
+          `
+        }
       })
     });
 
