@@ -200,133 +200,306 @@ export default function IntegroSystems() {
     };
   }, [turnstileLoaded]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setSubmitStatus(null);
-    setErrorMessage('');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setSubmitting(true);
+  setSubmitStatus(null);
+  setErrorMessage('');
 
-    // Validation
-    if (!formData.name || !formData.email || !formData.phone || !formData.message) {
-      setSubmitStatus('error');
-      setErrorMessage('Please fill in all required fields: Name, Email, Contact Number, and Requirements');
-      setSubmitting(false);
-      return;
-    }
+  // Validation
+  if (!formData.name || !formData.email || !formData.phone || !formData.message) {
+    setSubmitStatus('error');
+    setErrorMessage('Please fill in all required fields: Name, Email, Contact Number, and Requirements');
+    setSubmitting(false);
+    return;
+  }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setSubmitStatus('error');
-      setErrorMessage('Please enter a valid email address');
-      setSubmitting(false);
-      return;
-    }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(formData.email)) {
+    setSubmitStatus('error');
+    setErrorMessage('Please enter a valid email address');
+    setSubmitting(false);
+    return;
+  }
 
-    const phoneRegex = /^[\d\s\+\-\(\)]+$/;
-    if (!phoneRegex.test(formData.phone)) {
-      setSubmitStatus('error');
-      setErrorMessage('Please enter a valid phone number');
-      setSubmitting(false);
-      return;
-    }
+  const phoneRegex = /^[\d\s\+\-\(\)]+$/;
+  if (!phoneRegex.test(formData.phone)) {
+    setSubmitStatus('error');
+    setErrorMessage('Please enter a valid phone number');
+    setSubmitting(false);
+    return;
+  }
 
-    // Get the Turnstile token
-    const captchaToken = document.querySelector('input[name="cf-turnstile-response"]')?.value;
+  // Get the Turnstile token
+  const captchaToken = document.querySelector('input[name="cf-turnstile-response"]')?.value;
+  
+  if (!captchaToken) {
+    setSubmitStatus('error');
+    setErrorMessage('Please wait for the security verification to complete and try again.');
+    setSubmitting(false);
     
-    if (!captchaToken) {
-      setSubmitStatus('error');
-      setErrorMessage('Please wait for the security verification to complete and try again.');
-      setSubmitting(false);
+    // Try to reset the widget
+    if (turnstileWidgetId !== null && window.turnstile) {
+      try {
+        window.turnstile.reset(turnstileWidgetId);
+      } catch (e) {
+        console.error('Failed to reset Turnstile:', e);
+      }
+    }
+    return;
+  }
+
+  try {
+    const response = await fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        access_key: 'a35af147-667e-431e-973d-64375fb18ea5',
+        
+        // Enhanced email formatting with emojis
+        subject: `🚀 NEW IT ASSESSMENT REQUEST - ${formData.company || formData.name}`,
+        from_name: 'Integro Systems Website',
+        replyto: formData.email,
+        
+        // Primary contact info with emojis for better email readability
+        '👤 Contact Name': formData.name,
+        '🏢 Company': formData.company || 'Not Provided',
+        '📧 Email': formData.email,
+        '📱 Phone': formData.phone,
+        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━': '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+        '💼 IT REQUIREMENTS': formData.message,
+        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ': '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+        '⚡ Priority': 'HIGH',
+        '📍 Lead Source': 'Website Contact Form',
+        '🕐 Submitted': new Date().toLocaleString('en-ZA', { 
+          timeZone: 'Africa/Johannesburg',
+          dateStyle: 'full',
+          timeStyle: 'short'
+        }),
+        
+        // CAPTCHA token
+        'cf-turnstile-response': captchaToken,
+        
+        // ✅ AUTO-RESPONSE - Send confirmation email to the person who submitted
+        autoresponse: true,
+        
+        // Custom auto-response subject line
+        'autoresponse.subject': 'Thank You for Contacting Integro Systems - We\'ll Be In Touch Soon!',
+        
+        // Custom auto-response message (HTML supported)
+        'autoresponse.message': `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f3f4f6;
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .email-wrapper {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      background: linear-gradient(135deg, #3b82f6 0%, #14b8a6 100%);
+      padding: 40px 30px;
+      text-align: center;
+    }
+    .header img {
+      max-height: 60px;
+      margin-bottom: 15px;
+    }
+    .header h1 {
+      color: white;
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .header p {
+      color: #e0f2fe;
+      margin: 8px 0 0;
+      font-size: 14px;
+    }
+    .content {
+      padding: 40px 30px;
+    }
+    .greeting {
+      font-size: 18px;
+      color: #1e293b;
+      margin-bottom: 20px;
+    }
+    .message {
+      color: #475569;
+      margin-bottom: 25px;
+      font-size: 15px;
+    }
+    .info-box {
+      background: #f1f5f9;
+      border-left: 4px solid #14b8a6;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 25px 0;
+    }
+    .info-box h3 {
+      margin: 0 0 15px 0;
+      color: #1e293b;
+      font-size: 16px;
+    }
+    .info-item {
+      margin: 8px 0;
+      color: #475569;
+    }
+    .info-label {
+      font-weight: 600;
+      color: #1e293b;
+    }
+    .contact-box {
+      background: linear-gradient(135deg, #3b82f6 0%, #14b8a6 100%);
+      color: white;
+      padding: 25px;
+      border-radius: 12px;
+      margin: 25px 0;
+      text-align: center;
+    }
+    .contact-box h3 {
+      margin: 0 0 15px 0;
+      font-size: 18px;
+    }
+    .contact-item {
+      margin: 10px 0;
+      font-size: 15px;
+    }
+    .contact-item a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .footer {
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 30px;
+      text-align: center;
+      font-size: 13px;
+    }
+    .footer strong {
+      color: #cbd5e1;
+    }
+    .checkmark {
+      color: #10b981;
+      font-size: 48px;
+      text-align: center;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+    <div class="header">
+      <img src="https://i.postimg.cc/mrNHcz4K/copy-reduced-logo-removebg-preview.png" alt="Integro Systems">
+      <h1>Thank You for Your Inquiry!</h1>
+      <p>We've received your IT assessment request</p>
+    </div>
+    
+    <div class="content">
+      <div class="checkmark">✓</div>
       
-      // Try to reset the widget
+      <div class="greeting">
+        Hi ${formData.name},
+      </div>
+      
+      <div class="message">
+        Thank you for reaching out to Integro Systems! We've successfully received your IT assessment request and our team is reviewing your requirements.
+      </div>
+      
+      <div class="message">
+        <strong>What happens next?</strong><br>
+        One of our IT specialists will contact you within <strong>24 hours</strong> to discuss your specific needs and how we can help optimize your business technology infrastructure.
+      </div>
+      
+      <div class="info-box">
+        <h3>📋 Your Submission Details:</h3>
+        <div class="info-item"><span class="info-label">Name:</span> ${formData.name}</div>
+        <div class="info-item"><span class="info-label">Company:</span> ${formData.company || 'Not Provided'}</div>
+        <div class="info-item"><span class="info-label">Email:</span> ${formData.email}</div>
+        <div class="info-item"><span class="info-label">Phone:</span> ${formData.phone}</div>
+        <div class="info-item"><span class="info-label">Submitted:</span> ${new Date().toLocaleString('en-ZA', { 
+          timeZone: 'Africa/Johannesburg',
+          dateStyle: 'full',
+          timeStyle: 'short'
+        })}</div>
+      </div>
+      
+      <div class="contact-box">
+        <h3>Need Immediate Assistance?</h3>
+        <div class="contact-item">📞 <a href="tel:+27674148908">+27 67 414 8908</a></div>
+        <div class="contact-item">📧 <a href="mailto:support@integrosystems.co.za">support@integrosystems.co.za</a></div>
+        <div class="contact-item">💬 <a href="https://wa.me/27674148908">WhatsApp Us</a></div>
+      </div>
+      
+      <div class="message">
+        We look forward to partnering with you to deliver enterprise-grade IT solutions that drive your business forward.
+      </div>
+      
+      <div class="message" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+        <strong>Best regards,</strong><br>
+        The Integro Systems Team<br>
+        <em>Enterprise IT Support, Automation & Security Solutions</em>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p><strong>Integro Systems</strong></p>
+      <p>Pretoria, South Africa</p>
+      <p style="margin-top: 15px; font-size: 12px;">
+        This is an automated confirmation email. Please do not reply directly to this message.
+      </p>
+      <p style="margin-top: 5px;">© 2026 Integro Systems. All rights reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
+        `
+      })
+    });
+
+    const result = await response.json();
+    
+    if (result.success) {
+      setSubmitStatus('success');
+      setFormData({ name: '', email: '', phone: '', company: '', message: '' });
+      
+      // Reset Turnstile widget after successful submission
       if (turnstileWidgetId !== null && window.turnstile) {
         try {
           window.turnstile.reset(turnstileWidgetId);
+          console.log('✅ Turnstile widget reset after successful submission');
         } catch (e) {
           console.error('Failed to reset Turnstile:', e);
         }
       }
-      return;
-    }
-
-    try {
-      const response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          access_key: 'a35af147-667e-431e-973d-64375fb18ea5',
-          
-          // Enhanced email formatting with emojis
-          subject: `🚀 NEW IT ASSESSMENT REQUEST - ${formData.company || formData.name}`,
-          from_name: 'Integro Systems Website',
-          replyto: formData.email,
-          
-          // Primary contact info with emojis for better email readability
-          '👤 Contact Name': formData.name,
-          '🏢 Company': formData.company || 'Not Provided',
-          '📧 Email': formData.email,
-          '📱 Phone': formData.phone,
-          '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━': '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-          '💼 IT REQUIREMENTS': formData.message,
-          '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ': '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
-          '⚡ Priority': 'HIGH',
-          '📍 Lead Source': 'Website Contact Form',
-          '🕐 Submitted': new Date().toLocaleString('en-ZA', { 
-            timeZone: 'Africa/Johannesburg',
-            dateStyle: 'full',
-            timeStyle: 'short'
-          }),
-          
-          // CAPTCHA token
-          'cf-turnstile-response': captchaToken
-        })
-      });
-
-      const result = await response.json();
       
-      if (result.success) {
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', phone: '', company: '', message: '' });
-        
-        // Reset Turnstile widget after successful submission
-        if (turnstileWidgetId !== null && window.turnstile) {
-          try {
-            window.turnstile.reset(turnstileWidgetId);
-            console.log('✅ Turnstile widget reset after successful submission');
-          } catch (e) {
-            console.error('Failed to reset Turnstile:', e);
+      setTimeout(() => {
+        const contactSection = document.getElementById('contact');
+        if (contactSection) {
+          const formElement = contactSection.querySelector('.bg-white\\/5');
+          if (formElement) {
+            formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         }
-        
-        setTimeout(() => {
-          const contactSection = document.getElementById('contact');
-          if (contactSection) {
-            const formElement = contactSection.querySelector('.bg-white\\/5');
-            if (formElement) {
-              formElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-          }
-        }, 100);
-      } else {
-        setSubmitStatus('error');
-        setErrorMessage(result.message || 'There was an error submitting your form. Please try again.');
-        
-        // Reset Turnstile widget after error
-        if (turnstileWidgetId !== null && window.turnstile) {
-          try {
-            window.turnstile.reset(turnstileWidgetId);
-          } catch (e) {
-            console.error('Failed to reset Turnstile:', e);
-          }
-        }
-      }
-    } catch (error) {
-      console.error('Form submission error:', error);
+      }, 100);
+    } else {
       setSubmitStatus('error');
-      setErrorMessage('There was an error submitting your form. Please try again or contact us directly at support@integrosystems.co.za');
+      setErrorMessage(result.message || 'There was an error submitting your form. Please try again.');
       
       // Reset Turnstile widget after error
       if (turnstileWidgetId !== null && window.turnstile) {
@@ -336,10 +509,24 @@ export default function IntegroSystems() {
           console.error('Failed to reset Turnstile:', e);
         }
       }
-    } finally {
-      setSubmitting(false);
     }
-  };
+  } catch (error) {
+    console.error('Form submission error:', error);
+    setSubmitStatus('error');
+    setErrorMessage('There was an error submitting your form. Please try again or contact us directly at support@integrosystems.co.za');
+    
+    // Reset Turnstile widget after error
+    if (turnstileWidgetId !== null && window.turnstile) {
+      try {
+        window.turnstile.reset(turnstileWidgetId);
+      } catch (e) {
+        console.error('Failed to reset Turnstile:', e);
+      }
+    }
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
