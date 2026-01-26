@@ -916,9 +916,9 @@ export default function IntegroSystems() {
             <div className="inline-block mb-4 px-6 py-2 bg-gradient-to-r from-blue-100 to-teal-100 rounded-full text-blue-600 text-sm font-bold shadow-lg">
               One-Time Projects
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              One Time Project-Based IT Services
-            </h2>
+            <h3 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Project-Based IT Services
+            </h3>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Discrete IT projects with defined scope, timeline, and deliverables—ideal for infrastructure upgrades, migrations, or specialized implementations.
             </p>
