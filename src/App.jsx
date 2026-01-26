@@ -908,7 +908,7 @@ export default function IntegroSystems() {
         </div>
       </section>
 
-      {/* ⭐⭐⭐ PROJECT-BASED SERVICES SECTION - UPDATED DESIGN ⭐⭐⭐ */}
+    
       <section id="projects" className="py-20 px-4 bg-gradient-to-b from-slate-50 to-white">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -917,7 +917,7 @@ export default function IntegroSystems() {
               One-Time Projects
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Project-Based IT Services
+              One Time Project-Based IT Services
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Discrete IT projects with defined scope, timeline, and deliverables—ideal for infrastructure upgrades, migrations, or specialized implementations.
@@ -929,7 +929,7 @@ export default function IntegroSystems() {
             {projectServices.map((project, index) => (
               <div 
                 key={index}
-                className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:-translate-y-2 group relative overflow-hidden"
+                className="bg-gradient-to-r from-blue-100 to-teal-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-blue-200 hover:-translate-y-2 group relative overflow-hidden"
               >
                 {/* Animated Background Gradient */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
