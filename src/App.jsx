@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Shield, Server, Zap, CheckCircle, Menu, X, ArrowRight, Mail, Phone, MapPin, Clock, Users, Lock, Cpu, Cloud, MessageCircle, AlertCircle, Loader } from 'lucide-react';
+import { Shield, Server, Zap, CheckCircle, Menu, X, ArrowRight, Mail, Phone, MapPin, Clock, Users, Lock, Cpu, Cloud, MessageCircle, AlertCircle, Loader, Package } from 'lucide-react';
 
 // Feature Card Component with animation
 const FeatureCard = ({ icon: Icon, title, description, color, delay }) => {
@@ -462,6 +462,19 @@ export default function IntegroSystems() {
       title: "Custom Software Development",
       description: "Bespoke enterprise applications engineered to align with your specific business requirements and workflows.",
       features: ["Enterprise Web & Desktop Applications", "Cross-platform Mobile Solutions", "Legacy System Modernization", "Third-party System Integration"]
+    },
+    // ⭐ NEW SERVICES ADDED BELOW ⭐
+    {
+      icon: Package,
+      title: "Hardware & Infrastructure Procurement",
+      description: "Strategic hardware sourcing and lifecycle management that optimizes technology investments while ensuring operational continuity and security compliance.",
+      features: ["Enterprise-grade endpoint & server procurement", "Multi-vendor sourcing with competitive pricing", "White-glove device provisioning & configuration", "Proactive hardware refresh & lifecycle planning", "Asset tracking & warranty administration", "Certified secure disposal & data sanitization"]
+    },
+    {
+      icon: Cloud,
+      title: "Cloud & Hosting Infrastructure",
+      description: "Enterprise-class hosting and cloud infrastructure engineered for reliability, security, and seamless scalability as your business evolves.",
+      features: ["High-availability website & application hosting", "Multi-cloud infrastructure (Azure, AWS, GCP)", "Microsoft 365 & Google Workspace hosting", "Hybrid cloud & on-premises server management", "Geo-redundant backup & disaster recovery", "99.9% uptime SLA with 24/7 infrastructure monitoring"]
     }
   ];
 
@@ -515,6 +528,74 @@ export default function IntegroSystems() {
         "Compliance management & audit support"
       ],
       highlighted: false
+    }
+  ];
+
+  // ⭐ NEW PROJECT SERVICES ARRAY ⭐
+  const projectServices = [
+    {
+      icon: Cloud,
+      title: "Infrastructure & Migration Projects",
+      description: "Large-scale infrastructure transformations delivered with precision planning, minimal disruption, and comprehensive post-implementation support.",
+      features: [
+        "Cloud migration & digital transformation",
+        "Data center relocation & infrastructure refresh",
+        "Network infrastructure upgrade & redesign",
+        "Server virtualization & consolidation",
+        "Legacy system modernization",
+        "Office 365 / Google Workspace migration"
+      ],
+      investment: "R15,000 - R150,000+",
+      timeline: "2-12 weeks",
+      color: "from-purple-500 to-pink-500"
+    },
+    {
+      icon: Shield,
+      title: "Security Assessment & Hardening",
+      description: "Comprehensive security audits and implementation projects designed to identify vulnerabilities and deploy enterprise-grade protection measures.",
+      features: [
+        "Cybersecurity posture assessment & remediation",
+        "Penetration testing & vulnerability analysis",
+        "Zero-trust security architecture implementation",
+        "Compliance readiness (POPIA, ISO 27001)",
+        "Security policy development & staff training",
+        "Incident response planning & disaster recovery"
+      ],
+      investment: "R10,000 - R80,000+",
+      timeline: "1-8 weeks",
+      color: "from-red-500 to-orange-500"
+    },
+    {
+      icon: Cpu,
+      title: "Custom Software & Automation",
+      description: "Bespoke software solutions and intelligent automation that eliminate manual processes and integrate seamlessly with your existing systems.",
+      features: [
+        "Custom business application development",
+        "API integration & middleware solutions",
+        "Workflow automation & process optimization",
+        "Legacy application modernization & migration",
+        "Mobile application development (iOS/Android)",
+        "Data analytics & business intelligence platforms"
+      ],
+      investment: "R25,000 - R200,000+",
+      timeline: "4-16 weeks",
+      color: "from-blue-500 to-cyan-500"
+    },
+    {
+      icon: Zap,
+      title: "IT Strategy & Consulting",
+      description: "Comprehensive technology audits with actionable roadmaps for optimization, modernization, and strategic alignment with business objectives.",
+      features: [
+        "Complete IT infrastructure assessment",
+        "Technology strategy & roadmap development",
+        "Vendor evaluation & procurement consulting",
+        "Disaster recovery planning & testing",
+        "IT budgeting & capacity planning",
+        "Digital transformation consulting"
+      ],
+      investment: "R8,000 - R50,000+",
+      timeline: "1-6 weeks",
+      color: "from-teal-500 to-green-500"
     }
   ];
 
@@ -625,6 +706,11 @@ export default function IntegroSystems() {
                 Packages
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-teal-500 group-hover:w-full transition-all duration-300"></span>
               </a>
+              {/* ⭐ NEW PROJECTS LINK ⭐ */}
+              <a href="#projects" className="text-gray-700 hover:text-blue-600 transition-colors duration-300 font-medium relative group">
+                Projects
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-teal-500 group-hover:w-full transition-all duration-300"></span>
+              </a>
               <a href="#about" className="text-gray-700 hover:text-blue-600 transition-colors duration-300 font-medium relative group">
                 About
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-teal-500 group-hover:w-full transition-all duration-300"></span>
@@ -654,6 +740,8 @@ export default function IntegroSystems() {
             <div className="px-4 py-4 space-y-3">
               <a href="#services" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Services</a>
               <a href="#packages" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Packages</a>
+              {/* ⭐ NEW PROJECTS LINK IN MOBILE ⭐ */}
+              <a href="#projects" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Projects</a>
               <a href="#about" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">About</a>
               <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="block text-gray-700 hover:text-blue-600 py-2 transition-colors">Contact</a>
               <button 
@@ -815,6 +903,92 @@ export default function IntegroSystems() {
             >
               <span>Contact us for tailored pricing</span>
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ⭐⭐⭐ NEW PROJECT-BASED SERVICES SECTION ⭐⭐⭐ */}
+      <section id="projects" className="py-20 px-4 bg-gradient-to-b from-slate-50 to-white">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <div className="inline-block mb-4 px-6 py-2 bg-purple-100 rounded-full text-purple-600 text-sm font-bold">
+              One-Time Projects
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Project-Based IT Services
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Discrete IT projects with defined scope, timeline, and deliverables—ideal for infrastructure upgrades, migrations, or specialized implementations.
+            </p>
+          </div>
+
+          {/* Project Cards */}
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            {projectServices.map((project, index) => (
+              <div 
+                key={index}
+                className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:-translate-y-2 group"
+              >
+                {/* Color Bar */}
+                <div className={`w-full h-2 bg-gradient-to-r ${project.color} rounded-full mb-6`}></div>
+                
+                {/* Icon */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`w-16 h-16 bg-gradient-to-br ${project.color} rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg`}>
+                    <project.icon className="w-8 h-8 text-white" />
+                  </div>
+                </div>
+                
+                {/* Title & Description */}
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">{project.title}</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">{project.description}</p>
+                
+                {/* Investment & Timeline */}
+                <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Typical Investment</p>
+                    <p className="font-bold text-gray-900">{project.investment}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Timeline</p>
+                    <p className="font-bold text-gray-900">{project.timeline}</p>
+                  </div>
+                </div>
+                
+                {/* Features */}
+                <div className="space-y-3 mb-6">
+                  {project.features.map((feature, idx) => (
+                    <div key={idx} className="flex items-start space-x-3 group/item">
+                      <CheckCircle className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5 group-hover/item:scale-110 transition-transform" />
+                      <span className="text-gray-700 text-left">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* CTA Button */}
+                <button 
+                  onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
+                  className="w-full py-3 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-lg font-semibold hover:shadow-xl transition-all duration-300 hover:scale-105"
+                >
+                  Request Quote
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom CTA */}
+          <div className="text-center bg-gradient-to-r from-blue-600 to-teal-500 rounded-2xl p-8 text-white">
+            <h3 className="text-2xl font-bold mb-4">Not sure which service you need?</h3>
+            <p className="text-blue-50 mb-6 text-lg">
+              Schedule a complimentary consultation to discuss your specific requirements and receive a customized proposal.
+            </p>
+            <button 
+              onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
+              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold hover:shadow-xl transition-all duration-300 hover:scale-105"
+            >
+              Schedule Consultation
             </button>
           </div>
         </div>
@@ -1061,7 +1235,7 @@ export default function IntegroSystems() {
                 className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all resize-none disabled:opacity-50 disabled:cursor-not-allowed"
               ></textarea>
               
-              {/* Turnstile Container - Now using explicit render with ref */}
+              {/* Turnstile Container */}
               <div className="flex justify-center min-h-[65px]">
                 <div ref={turnstileRef}></div>
               </div>
