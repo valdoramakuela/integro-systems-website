@@ -547,7 +547,7 @@ export default function IntegroSystems() {
       ],
       investment: "R15,000 - R150,000+",
       timeline: "2-12 weeks",
-      color: "from-purple-500 to-pink-500"
+      color: "from-blue-600 to-cyan-500"
     },
     {
       icon: Shield,
@@ -563,7 +563,7 @@ export default function IntegroSystems() {
       ],
       investment: "R10,000 - R80,000+",
       timeline: "1-8 weeks",
-      color: "from-red-500 to-orange-500"
+      color: "from-teal-500 to-blue-500"
     },
     {
       icon: Cpu,
@@ -579,7 +579,7 @@ export default function IntegroSystems() {
       ],
       investment: "R25,000 - R200,000+",
       timeline: "4-16 weeks",
-      color: "from-blue-500 to-cyan-500"
+      color: "from-cyan-500 to-teal-500"
     },
     {
       icon: Zap,
@@ -595,7 +595,7 @@ export default function IntegroSystems() {
       ],
       investment: "R8,000 - R50,000+",
       timeline: "1-6 weeks",
-      color: "from-teal-500 to-green-500"
+      color: "from-blue-500 to-indigo-600"
     }
   ];
 
@@ -908,12 +908,12 @@ export default function IntegroSystems() {
         </div>
       </section>
 
-      {/* ⭐⭐⭐ NEW PROJECT-BASED SERVICES SECTION ⭐⭐⭐ */}
+      {/* ⭐⭐⭐ PROJECT-BASED SERVICES SECTION - UPDATED DESIGN ⭐⭐⭐ */}
       <section id="projects" className="py-20 px-4 bg-gradient-to-b from-slate-50 to-white">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-16">
-            <div className="inline-block mb-4 px-6 py-2 bg-purple-100 rounded-full text-purple-600 text-sm font-bold">
+            <div className="inline-block mb-4 px-6 py-2 bg-gradient-to-r from-blue-100 to-teal-100 rounded-full text-blue-600 text-sm font-bold shadow-lg">
               One-Time Projects
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -929,67 +929,82 @@ export default function IntegroSystems() {
             {projectServices.map((project, index) => (
               <div 
                 key={index}
-                className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:-translate-y-2 group"
+                className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:-translate-y-2 group relative overflow-hidden"
               >
-                {/* Color Bar */}
-                <div className={`w-full h-2 bg-gradient-to-r ${project.color} rounded-full mb-6`}></div>
+                {/* Animated Background Gradient */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${project.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
                 
-                {/* Icon */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`w-16 h-16 bg-gradient-to-br ${project.color} rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg`}>
-                    <project.icon className="w-8 h-8 text-white" />
+                {/* Color Bar */}
+                <div className={`relative w-full h-2 bg-gradient-to-r ${project.color} rounded-full mb-8 shadow-lg group-hover:h-3 transition-all duration-300`}></div>
+                
+                {/* Icon - CENTERED */}
+                <div className="relative flex justify-center mb-6">
+                  <div className={`w-20 h-20 bg-gradient-to-br ${project.color} rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-xl`}>
+                    <project.icon className="w-10 h-10 text-white" />
                   </div>
                 </div>
                 
                 {/* Title & Description */}
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">{project.title}</h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">{project.description}</p>
+                <h3 className="relative text-2xl font-bold text-gray-900 mb-4 text-center">{project.title}</h3>
+                <p className="relative text-gray-600 mb-6 leading-relaxed text-center">{project.description}</p>
                 
                 {/* Investment & Timeline */}
-                <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
-                  <div>
+                <div className="relative grid grid-cols-2 gap-4 mb-6 p-4 bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg border border-gray-100">
+                  <div className="text-center">
                     <p className="text-sm text-gray-500 mb-1">Typical Investment</p>
-                    <p className="font-bold text-gray-900">{project.investment}</p>
+                    <p className="font-bold text-gray-900 text-sm">{project.investment}</p>
                   </div>
-                  <div>
+                  <div className="text-center">
                     <p className="text-sm text-gray-500 mb-1">Timeline</p>
-                    <p className="font-bold text-gray-900">{project.timeline}</p>
+                    <p className="font-bold text-gray-900 text-sm">{project.timeline}</p>
                   </div>
                 </div>
                 
                 {/* Features */}
-                <div className="space-y-3 mb-6">
+                <div className="relative space-y-3 mb-8">
                   {project.features.map((feature, idx) => (
                     <div key={idx} className="flex items-start space-x-3 group/item">
                       <CheckCircle className="w-5 h-5 text-teal-500 flex-shrink-0 mt-0.5 group-hover/item:scale-110 transition-transform" />
-                      <span className="text-gray-700 text-left">{feature}</span>
+                      <span className="text-gray-700 text-left text-sm">{feature}</span>
                     </div>
                   ))}
                 </div>
                 
-                {/* CTA Button */}
+                {/* CTA Button - ANIMATED */}
                 <button 
                   onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
-                  className="w-full py-3 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-lg font-semibold hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  className={`relative w-full py-4 bg-gradient-to-r ${project.color} text-white rounded-lg font-bold text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 group/btn overflow-hidden`}
                 >
-                  Request Quote
+                  {/* Button shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover/btn:opacity-20 transform -skew-x-12 group-hover/btn:translate-x-full transition-all duration-700"></div>
+                  
+                  <span className="relative flex items-center justify-center space-x-2">
+                    <span>Request Quote</span>
+                    <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+                  </span>
                 </button>
               </div>
             ))}
           </div>
 
           {/* Bottom CTA */}
-          <div className="text-center bg-gradient-to-r from-blue-600 to-teal-500 rounded-2xl p-8 text-white">
-            <h3 className="text-2xl font-bold mb-4">Not sure which service you need?</h3>
-            <p className="text-blue-50 mb-6 text-lg">
-              Schedule a complimentary consultation to discuss your specific requirements and receive a customized proposal.
-            </p>
-            <button 
-              onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
-              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold hover:shadow-xl transition-all duration-300 hover:scale-105"
-            >
-              Schedule Consultation
-            </button>
+          <div className="text-center bg-gradient-to-r from-blue-600 via-blue-500 to-teal-500 rounded-2xl p-10 text-white shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 relative overflow-hidden group">
+            {/* Animated background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+            
+            <div className="relative">
+              <h3 className="text-3xl font-bold mb-4">Not sure which service you need?</h3>
+              <p className="text-blue-50 mb-8 text-lg max-w-2xl mx-auto">
+                Schedule a complimentary consultation to discuss your specific requirements and receive a customized proposal.
+              </p>
+              <button 
+                onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}
+                className="bg-white text-blue-600 px-10 py-4 rounded-lg font-bold text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 inline-flex items-center space-x-2 group/btn"
+              >
+                <span>Schedule Consultation</span>
+                <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
