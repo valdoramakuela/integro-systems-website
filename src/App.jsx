@@ -684,16 +684,16 @@ export default function IntegroSystems() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 overflow-x-hidden">
       {/* Navigation */}
       <nav className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? 'bg-white shadow-xl' : 'bg-white/95 backdrop-blur-sm'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 flex-shrink-0">
               <img 
                 src="https://i.postimg.cc/mrNHcz4K/copy-reduced-logo-removebg-preview.png" 
                 alt="Integro Systems Logo" 
-                className="h-20 md:h-20 transition-transform duration-300 hover:scale-100"
+                className="h-16 md:h-20 transition-transform duration-300 hover:scale-100"
               />
             </div>
             
@@ -728,7 +728,7 @@ export default function IntegroSystems() {
               Get Started
             </button>
 
-            <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <button className="md:hidden text-gray-700 hover:text-blue-600 transition-colors p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle menu">
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
@@ -761,24 +761,24 @@ export default function IntegroSystems() {
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4 bg-slate-950 text-white relative overflow-hidden">
         {/* Animated background elements */}
-        <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0 opacity-20 overflow-hidden">
           <div className="absolute top-20 left-10 w-96 h-96 bg-blue-600 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-20 right-10 w-[500px] h-[500px] bg-indigo-600 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
           <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-blue-700 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
         </div>
         
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="max-w-7xl mx-auto relative z-10 px-2">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-block mb-6 px-6 py-3 bg-blue-600/50 backdrop-blur-md rounded-full text-white text-sm md:text-base font-bold border-2 border-blue-400/60 animate-fadeIn shadow-2xl shadow-blue-500/50" style={{boxShadow: '0 0 30px rgba(59, 130, 246, 0.6), 0 0 60px rgba(59, 130, 246, 0.3)'}}>
+            <div className="inline-block mb-6 px-4 md:px-6 py-3 bg-blue-600/50 backdrop-blur-md rounded-full text-white text-xs md:text-sm font-bold border-2 border-blue-400/60 animate-fadeIn shadow-2xl shadow-blue-500/50" style={{boxShadow: '0 0 30px rgba(59, 130, 246, 0.6), 0 0 60px rgba(59, 130, 246, 0.3)'}}>
               Trusted IT Partner for South African Enterprises
             </div>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight animate-fadeInUp drop-shadow-lg">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight animate-fadeInUp drop-shadow-lg break-words">
               <span className="text-white font-extrabold">Enterprise-Grade IT Infrastructure,</span>
               <span className="block mt-2 font-extrabold animated-gradient-text">
                 Delivered with Precision
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-100 mb-10 max-w-3xl mx-auto leading-relaxed animate-fadeInUp drop-shadow-md" style={{animationDelay: '0.2s'}}>
+            <p className="text-lg md:text-xl lg:text-2xl text-gray-100 mb-10 max-w-3xl mx-auto leading-relaxed animate-fadeInUp drop-shadow-md px-4" style={{animationDelay: '0.2s'}}>
               Empowering South African businesses with resilient IT systems, intelligent automation, and multi-layered cybersecurity solutions designed for operational excellence.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fadeInUp" style={{animationDelay: '0.4s'}}>
@@ -908,7 +908,7 @@ export default function IntegroSystems() {
         </div>
       </section>
 
-    
+      {/* ⭐⭐⭐ PROJECT-BASED SERVICES SECTION - UPDATED DESIGN ⭐⭐⭐ */}
       <section id="projects" className="py-20 px-4 bg-gradient-to-b from-slate-50 to-white">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -916,9 +916,9 @@ export default function IntegroSystems() {
             <div className="inline-block mb-4 px-6 py-2 bg-gradient-to-r from-blue-100 to-teal-100 rounded-full text-blue-600 text-sm font-bold shadow-lg">
               One-Time Projects
             </div>
-            <h3 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
               Project-Based IT Services
-            </h3>
+            </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Discrete IT projects with defined scope, timeline, and deliverables—ideal for infrastructure upgrades, migrations, or specialized implementations.
             </p>
